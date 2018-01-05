@@ -90,7 +90,7 @@ export function update_data(probabilities, paths) {
 			document.getElementById('detailHeading').innerHTML = 'Change or Confirm ' + paths.length + ' Labels';
 		}
 	} else {
-		document.getElementById('detailImage').src = 'api/image/other/all/placeholder/placeholder.jpg';
+		document.getElementById('detailImage').src = 'api/icon/placeholder.jpg';
 		document.getElementById('detailHeading').innerHTML = 'Change or Confirm Labels';
 	}
 	

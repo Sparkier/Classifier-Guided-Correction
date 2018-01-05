@@ -188,7 +188,7 @@ export default function trainclass(dataset) {
 					if (ssim_indicator) {
 						var dim = Math.min(total_chart_width, total_chart_height)
 						confusion_main.append('svg:image')
-							.attr('xlink:href', 'api/image/other/all/duplicates/duplicates.png')
+							.attr('xlink:href', 'api/icon/duplicates.png')
 							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2) + ((total_chart_width - dim)/2)))
 							.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2) + ((total_chart_height - dim)/2)))
 							.attr('width', dim)
