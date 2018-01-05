@@ -1,0 +1,56 @@
+body {
+  padding: 4em 2em 10em;
+  height: 100%;
+}
+
+body,
+.wrapper {
+  margin: 10px auto;
+  font-family: Fira Sans;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0; 
+  right: 0;
+  background-color: #A32638;
+  color: white;
+  padding-left: 2em;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #A32638;
+  color: white;
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.confusionContainer {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 9em;
+  bottom: 3em;
+}
+
+/* Axis styles */
+.axis {
+	font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+  shape-rendering: crispEdges;
+}
+
+.right {
+  float: right;
+  display: block;
+}

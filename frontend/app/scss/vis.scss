@@ -1,0 +1,86 @@
+body {
+  padding: 4em 2em 10em;
+  height: 100%;
+  overflow: hidden;
+}
+
+body,
+.wrapper {
+  margin: 18px auto;
+  font-family: Fira Sans;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0; 
+  right: 0;
+  background-color: #A32638;
+  color: white;
+  padding-left: 2em;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #A32638;
+  color: white;
+  padding-left: 2em;
+}
+
+/* Classifications on left of the Site */
+.leftSection {
+  width: 490px;
+  height: 100%;
+  float: right;
+}
+
+.classificationContainer {
+  height: calc(100% - 8em);
+  position: absolute;
+  padding: 5px;
+  background-color: lightgrey;
+}
+
+.test {
+  height: calc(100%);
+}
+
+.detailContainer {
+    height: calc(100%);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Images on the left of the Site */
+.rightSection {
+  height: 100%;
+  width: calc(100% - 550px);
+  float: left;
+}
+.imagesContainer {
+  height: calc(60%);
+  width: calc(100% - 650px);
+  position: absolute;
+  overflow: auto;
+}
+.ssimContainer {
+  height: 90px;
+  width: calc(100% - 650px);
+  position: absolute;
+  bottom: 3em; 
+  background-color: lightgrey;
+}
+
+/* Selection style for selecting Image Groups */
+rect.selected {
+  stroke: black;
+}
+rect.correctly {
+  fill: hsl(0, 60%, 50%);
+}
+rect.falsely {
+  fill: hsl(115, 60%, 25%);
+}
