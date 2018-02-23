@@ -4,7 +4,6 @@ const d3 = require('d3');
 export default function confusionmatrix(dataset) {
 	// Get the Classes from the text File that was used for training the labels
 	d3.text('api/labels_txt/' + dataset, function(error, retrained_labels) {
-		console.log(retrained_labels);
 		// Newline for each Label
 		retrained_labels = retrained_labels.split('\n');
 		var num_classes = retrained_labels.length;
@@ -36,7 +35,6 @@ export default function confusionmatrix(dataset) {
 
 		// Load the Image Classification Results
 		d3.tsv('api/train_csv/' + dataset, function(error, data) {
-			console.log(data);
 			for (var i = 0; i < num_classes; i++) {
 				for (var j = 0; j < num_classes; j++) {
 					buckets.push({
