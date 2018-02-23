@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "d3": "^4.9.1",
+    "fabric": "^2.0.3",
     "gulp-sourcemaps": "^2.6.1",
     "jquery": "^3.2.1",
     "vinyl-buffer": "^1.0.0"
