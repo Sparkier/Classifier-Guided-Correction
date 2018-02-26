@@ -22,7 +22,7 @@ def should_move(dataset, location, label):
         new_name = new_name + item + '/'
     new_name = new_name[:-1]
     new_location = new_location + '/' + new_name
-    old_location = dataset+'/'+location
+    old_location = data_location + dataset + '/' + location
     if old_location == new_location:
         return location
     else:
