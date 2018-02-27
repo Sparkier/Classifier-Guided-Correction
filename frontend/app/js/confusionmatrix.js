@@ -38,9 +38,9 @@ export default function confusionmatrix(dataset) {
 			for (var i = 0; i < num_classes; i++) {
 				for (var j = 0; j < num_classes; j++) {
 					buckets.push({
-						class: i,
+						label: i,
+						class: j,
 						num_images: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-						label: j,
 						num_total: 0,
 						score_wrong: 0.0
 					});
@@ -57,7 +57,7 @@ export default function confusionmatrix(dataset) {
 				d.confirmed = +d.confirmed;
 
 				if (!d.confirmed) {
-					var curr = buckets[d.label * num_classes + d.class];
+					var curr = buckets[d.class * num_classes + d.label];
 					curr.num_images[Math.round(d.percentage * 10)]++;
 					curr.num_total++;
 					max_images = curr.num_images[Math.round(d.percentage * 10)] > max_images ? 
@@ -159,7 +159,7 @@ export default function confusionmatrix(dataset) {
 						ssim_indicator = true;
 					}
 
-					var buck = buckets[i * num_classes + j];
+					var buck = buckets[j * num_classes + i];
 					var bucks = [];
 					var correct = (buck.label == buck.class);
 					var color = correct ? 'hsl(115, 60%, 25%)' : 'hsl(0, 60%, 50%)';
