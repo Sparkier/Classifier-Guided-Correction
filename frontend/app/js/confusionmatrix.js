@@ -152,14 +152,15 @@ export default function confusionmatrix(dataset) {
 			  Start: Add a Rect for each Bucket
 			***********************************************************/
 			for (var i = 0; i < num_classes; i++) {
-				for (var j = 0; j < num_classes; j++) {
+				for (var j = 0; j < num_classes - 1; j++) {
+					var j_modified = (i < j) ? j + 1 : j;
 					// Check for SSIM
 					var ssim_indicator = false;
-					if (ssim_buckets[i * num_classes + j].max_ssim > 0.95) {
+					if (ssim_buckets[i * num_classes + j_modified].max_ssim > 0.95) {
 						ssim_indicator = true;
 					}
 
-					var buck = buckets[j * num_classes + i];
+					var buck = buckets[j_modified * num_classes + i];
 					var bucks = [];
 					var correct = (buck.label == buck.class);
 					var color = correct ? 'hsl(115, 60%, 25%)' : 'hsl(0, 60%, 50%)';
@@ -170,8 +171,8 @@ export default function confusionmatrix(dataset) {
 					}
 
 					confusion_main.append('rect')
-						.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
-						.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2)))
+						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
 						.attr('width', total_chart_width)
 						.attr('height', total_chart_height)
 						.style('fill', 'hsl(238, ' + saturation + '%, ' + value + '%)')
@@ -180,9 +181,9 @@ export default function confusionmatrix(dataset) {
 					for (var k = parseInt((start_prob * 10)); k < 11; k++) {
 						confusion_main.append('rect')
 							// Calcualte the Position of the Rect
-							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
+							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
 							.attr('y', area_scale_y(parseFloat(k)/10.0) +
-												 (buck.class * (total_chart_height + chart_padding) +
+												 (i * (total_chart_height + chart_padding) +
 												 (chart_padding / 2)))
 							.attr('width', x_scale_trainclass(buck.num_images[k]))
 							.attr('height', rect_height)
@@ -193,30 +194,30 @@ export default function confusionmatrix(dataset) {
 						var dim = Math.min(total_chart_width, total_chart_height)
 						confusion_main.append('svg:image')
 							.attr('xlink:href', 'api/icon/duplicates.png')
-							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2) + 
+							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2) + 
 							           ((total_chart_width - dim)/2)))
-							.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2) + 
+							.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2) + 
 							           ((total_chart_height - dim)/2)))
 							.attr('width', dim)
 							.attr('height', dim);
 					}
 
 					confusion_main.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + i + '&class=' + j)
+						.attr("xlink:href", 'trainclass.html?label=' + i + '&class=' + j_modified)
 						.append('rect')
-						.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
-						.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2)))
+						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
 						.attr('width', total_chart_width)
 						.attr('height', total_chart_height)
 						.style('fill', 'transparent');
 
 					confusion_main.append('text')
-						.text(buck.class)
+						.text(j_modified)
 						.style('text_anchor', 'middle')
-						.attr('transform', 'translate('+ (((i + 1) * (total_chart_width + chart_padding)) - 
+						.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) - 
 																				 (chart_padding/2) - (total_chart_width/2)) +
 																				 ','+ 
-																				 (((j + 1) * (total_chart_height + chart_padding)) - 
+																				 (((i + 1) * (total_chart_height + chart_padding)) - 
 																				 (chart_padding/2) - (total_chart_height/2)) +')');
 				}
 			}
