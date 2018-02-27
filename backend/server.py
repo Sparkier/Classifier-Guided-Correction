@@ -87,7 +87,6 @@ def class_ssim_csv(dataset, label, clas):
 
 @app.route('/labels_txt/<dataset>')
 def labels_txt(dataset):
-    print('test')
     return send_file(data_location + dataset + '/retrained_labels.txt',
                      mimetype='text/txt',
                      attachment_filename='retrained_labels.txt',
@@ -185,7 +184,7 @@ def modify_delete(dataset, lbl, classification):
             if (t[0]['name'] == name):
                 tsne_saliency = t[1]
         if should_delete(confirmed):
-            name = remove(dataset, name)
+            remove(dataset, name)
         else:
             test_writer.writerow([image, label, clas, percentage, name,
                                   probabilities, confirmed, distance_grey,
