@@ -60,7 +60,8 @@ export default function confusionmatrix(dataset) {
 					var curr = buckets[d.label * num_classes + d.class];
 					curr.num_images[Math.round(d.percentage * 10)]++;
 					curr.num_total++;
-					max_images = curr.num_images[Math.round(d.percentage * 10)] > max_images ? Math.round(curr.num_images[Math.round(d.percentage * 10)]) : max_images;
+					max_images = curr.num_images[Math.round(d.percentage * 10)] > max_images ? 
+					             Math.round(curr.num_images[Math.round(d.percentage * 10)]) : max_images;
 					curr.score_wrong += d.percentage;
 				}
 			});
@@ -141,7 +142,8 @@ export default function confusionmatrix(dataset) {
 			// Scales for Area Functions
 			var num_rects = (1.0 - start_prob) / 0.1 + 1;
 			var rect_height = total_chart_height / num_rects;
-			var area_scale_y = d3.scaleLinear().domain([start_prob, 1.0]).range([total_chart_height - rect_height, 0.0]);
+			var area_scale_y = d3.scaleLinear().domain([start_prob, 1.0]).range([total_chart_height - 
+				                                                                  rect_height, 0.0]);
 			/***********************************************************
 			  End: Scales
 			***********************************************************/
@@ -179,7 +181,9 @@ export default function confusionmatrix(dataset) {
 						confusion_main.append('rect')
 							// Calcualte the Position of the Rect
 							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
-							.attr('y', area_scale_y(parseFloat(k)/10.0) + (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2)))
+							.attr('y', area_scale_y(parseFloat(k)/10.0) +
+												 (buck.class * (total_chart_height + chart_padding) +
+												 (chart_padding / 2)))
 							.attr('width', x_scale_trainclass(buck.num_images[k]))
 							.attr('height', rect_height)
 							.attr('fill', color);
@@ -189,8 +193,10 @@ export default function confusionmatrix(dataset) {
 						var dim = Math.min(total_chart_width, total_chart_height)
 						confusion_main.append('svg:image')
 							.attr('xlink:href', 'api/icon/duplicates.png')
-							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2) + ((total_chart_width - dim)/2)))
-							.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2) + ((total_chart_height - dim)/2)))
+							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2) + 
+							           ((total_chart_width - dim)/2)))
+							.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2) + 
+							           ((total_chart_height - dim)/2)))
 							.attr('width', dim)
 							.attr('height', dim);
 					}
@@ -203,6 +209,15 @@ export default function confusionmatrix(dataset) {
 						.attr('width', total_chart_width)
 						.attr('height', total_chart_height)
 						.style('fill', 'transparent');
+
+					confusion_main.append('text')
+						.text(buck.class)
+						.style('text_anchor', 'middle')
+						.attr('transform', 'translate('+ (((i + 1) * (total_chart_width + chart_padding)) - 
+																				 (chart_padding/2) - (total_chart_width/2)) +
+																				 ','+ 
+																				 (((j + 1) * (total_chart_height + chart_padding)) - 
+																				 (chart_padding/2) - (total_chart_height/2)) +')');
 				}
 			}
 			/***********************************************************
@@ -217,11 +232,16 @@ export default function confusionmatrix(dataset) {
 				var t = svg_confusion.append('text')
 					.text(retrained_labels[i])
 					.style("text-anchor", "middle")
-					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * (total_chart_height + chart_padding)) - (chart_padding/2) - (total_chart_height/2)) +')');
+					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * 
+																			 (total_chart_height + chart_padding)) - (chart_padding/2) - 
+																			 (total_chart_height/2)) +')');
 				// Add the Class Name
 				svg_confusion.append('text')
 					.text(retrained_labels[i])
-					.attr('transform', 'translate('+ (margin.left + ((i + 1) * (total_chart_width + chart_padding)) - (chart_padding/2) - (total_chart_width/2)) +','+ 65 +'), rotate(-30)');
+					.attr('transform', 'translate('+ (margin.left + ((i + 1) *
+																			 (total_chart_width + chart_padding)) - (chart_padding/2) - 
+																			 (total_chart_width/2)) +','+ 65 +
+																			 '), rotate(-30)');
 			}
 			/***********************************************************
 			  End: Diagram Axes for each Class and Diagram Heading
