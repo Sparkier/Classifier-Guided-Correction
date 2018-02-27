@@ -7,6 +7,7 @@ var canvas;
 var canvas_ssim;
 var selected_paths = [];
 var selected_probs = [];
+
 export function load_images(dataset, images, num_images, correct) {
   // Create the Canvas Element
   var newCanvas = document.createElement("canvas");
@@ -59,7 +60,6 @@ export function load_images(dataset, images, num_images, correct) {
       switch (mode) {
         case 1:
           return parseFloat(b.percentage) - parseFloat(a.percentage);
-          break;
       }
     });
 
