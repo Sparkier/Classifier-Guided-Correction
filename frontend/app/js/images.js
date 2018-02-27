@@ -129,7 +129,7 @@ export function load_images_SSIM(dataset, ssim, all_images) {
         num_pairs = 0;
       } else {
         // Go further (a pair has been skipped).
-        num_pairs = num_pairs+1;
+        num_pairs = num_pairs + 1;
         i_offset = i_offset + 1;
       }
     }
