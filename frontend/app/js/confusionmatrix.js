@@ -245,6 +245,28 @@ export default function confusionmatrix(dataset) {
 											','+ 
 											((i + 1) * (total_chart_height + chart_padding) - chart_padding) 
 											+')');
+
+					confusion_main.append('rect')
+						.attr('x', 0)
+						.attr('y', 0)
+						.attr('width', 0)
+						.attr('height', 0)
+						.style('fill', 'grey')
+						.attr('class', 'overlayLeft');
+					confusion_main.append('rect')
+						.attr('x', 0)
+						.attr('y', 0)
+						.attr('width', 0)
+						.attr('height', 0)
+						.style('fill', 'grey')
+						.attr('class', 'overlayRight');
+					confusion_main.append('rect')
+						.attr('x', 0)
+						.attr('y', 0)
+						.attr('width', 0)
+						.attr('height', 0)
+						.style('fill', 'grey')
+						.attr('class', 'overlayBottom');
 				}
 				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
