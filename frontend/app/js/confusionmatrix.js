@@ -45,13 +45,16 @@ export default function confusionmatrix(dataset) {
 					score_wrong: 0.0
 				});
 				ssim_buckets.push({
-					class: i,
-					label: j,
+					label: i,
+					class: j,
 					max_ssim: 0.0,
 					avg_ssim: 0.0
 				});
 			}
-			num_in_label.push(0);
+			num_in_label.push({
+				label: i,
+				number: 0
+			});
 		}
 
 		// Load the Image Classification Results.
@@ -73,8 +76,12 @@ export default function confusionmatrix(dataset) {
 					curr.score_wrong += d.percentage;
 
 					// Update total number of Images for this Label.
-					num_in_label[d.label]++;
+					num_in_label[d.label].number++;
 				}
+			});
+
+			num_in_label.sort(function(a, b) {
+				return parseFloat(b.number) - parseFloat(a.number);
 			});
 
 			// Get the Maximal score_wrong for the color scaling.
@@ -136,21 +143,23 @@ export default function confusionmatrix(dataset) {
 			// Scale on y Axis for Cell positions.
 			var area_scale_y = d3.scaleLinear().domain([start_prob, 1.0]).range([total_chart_height - 
 				                                                                rect_height, 0.0]);
-			
+
 			// Add Cells for each Bucket
 			for (var i = 0; i < num_classes; i++) {
 				for (var j = 0; j < num_classes - 1; j++) {
+					// Display Buckets sorted by total number of Items.
+					var label_number = num_in_label[i].label;
 					// Modify j so that label == class is not displayed.
 					var j_modified = (i <= j) ? j + 1 : j;
 
 					// Check for SSIM
 					var ssim_indicator = false;
-					if (ssim_buckets[i * num_classes + j_modified].max_ssim > 0.95) {
+					if (ssim_buckets[j_modified * num_classes + label_number].max_ssim > 0.95) {
 						ssim_indicator = true;
 					}
 
 					// Get the Current Bucket with its properties.
-					var buck = buckets[j_modified * num_classes + i];
+					var buck = buckets[j_modified * num_classes + label_number];
 					var color = 'hsl(0, 60%, 50%)';
 					var value = (buck.num_total == 0) ? 80 : 60;
 					// Only saturate when at least 0.1*score_wrong.
@@ -196,7 +205,7 @@ export default function confusionmatrix(dataset) {
 
 					// Add Hyperrefs linking to the Detail View
 					confusion_main.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + i + '&class=' + j_modified)
+						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + j_modified)
 						.append('rect')
 						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
 						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
@@ -214,13 +223,10 @@ export default function confusionmatrix(dataset) {
 											(((i + 1) * (total_chart_height + chart_padding)) - 
 											(chart_padding/2) - (total_chart_height/2)) +')');
 				}
-			}
-
-			// Diagram Axes for each Class and Diagram Heading.
-			for (var i = 0; i < num_classes; i++) {
+				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
 				var t = svg_confusion.append('text')
-					.text(retrained_labels[i])
+					.text(retrained_labels[label_number])
 					.style("text-anchor", "middle")
 					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * 
 																			 (total_chart_height + chart_padding)) - (chart_padding/2) - 
