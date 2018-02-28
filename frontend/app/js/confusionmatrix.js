@@ -51,12 +51,12 @@ export default function confusionmatrix(dataset) {
 			  Start: Convert all images and sort them into Buckets
 			***********************************************************/  
 			data.forEach(function(d) {
-				d.label = +d.label;
-				d.class = +d.class;
-				d.percentage = +d.percentage;
 				d.confirmed = +d.confirmed;
 
 				if (!d.confirmed) {
+					d.label = +d.label;
+					d.class = +d.class;
+					d.percentage = +d.percentage;
 					var curr = buckets[d.class * num_classes + d.label];
 					curr.num_images[Math.round(d.percentage * 10)]++;
 					curr.num_total++;
