@@ -215,13 +215,13 @@ export default function confusionmatrix(dataset) {
 
 					// Add Text displaying the Classification Result.
 					confusion_main.append('text')
-						.text(j_modified)
+						.text(retrained_labels[j_modified])
 						.style('text_anchor', 'middle')
 						.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) - 
 											(chart_padding/2) - (total_chart_width/2)) +
 											','+ 
-											(((i + 1) * (total_chart_height + chart_padding)) - 
-											(chart_padding/2) - (total_chart_height/2)) +')');
+											((i + 1) * (total_chart_height + chart_padding) - chart_padding) 
+											+')');
 				}
 				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
@@ -231,13 +231,6 @@ export default function confusionmatrix(dataset) {
 					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * 
 																			 (total_chart_height + chart_padding)) - (chart_padding/2) - 
 																			 (total_chart_height/2)) +')');
-				// Add the Class Name
-				svg_confusion.append('text')
-					.text(retrained_labels[i])
-					.attr('transform', 'translate('+ (margin.left + ((i + 1) *
-																			 (total_chart_width + chart_padding)) - (chart_padding/2) - 
-																			 (total_chart_width/2)) +','+ 65 +
-																			 '), rotate(-30)');
 			}
 			
 			// Visual sparation of Text and Diagram
