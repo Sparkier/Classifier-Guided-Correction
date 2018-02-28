@@ -300,7 +300,7 @@ export default function confusionmatrix(dataset) {
 				.attr('height', 0)
 				.style('fill', 'white')
 				.attr('class', 'overlayLeftTop')
-				.attr('opacity', '0.8');
+				.attr('opacity', '0.0');
 			// Rect for hiding Bottom Area of Numbers.
 			svg_confusion.append('rect')
 				.attr('x', 0)
@@ -309,28 +309,34 @@ export default function confusionmatrix(dataset) {
 				.attr('height', 0)
 				.style('fill', 'white')
 				.attr('class', 'overlayLeftBottom')
-				.attr('opacity', '0.8');;
+				.attr('opacity', '0.0');
 
 			// Called when User hovers over a Cell.
 			function handleMouseOver(d, i) {
 				// Hide other Numbers
 				var current = d3.select(this);
 				d3.select('.overlayLeftTop')
-					.attr('height', current.attr('y') - 1);
+					.attr('height', current.attr('y') - 1)
+					.transition()
+						.attr('opacity', '0.8');
 				d3.select('.overlayLeftBottom')
 					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height')) + margin.top))
 					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
-							parseInt(current.attr('height'))));
+							parseInt(current.attr('height'))))
+					.transition()
+					.attr('opacity', '0.8');
 			}
 			
 			// Called when Mouse is not over a Cell anymore.
 			function handleMouseOut(d, i) {
 				// Show all Numbers
 				d3.select('.overlayLeftTop')
-					.attr('height', 0);
+					.attr('height', 0)
+					.attr('opacity', '0.0');
 				d3.select('.overlayLeftBottom')
 					.attr('y', 0)
-					.attr('height', 0);
+					.attr('height', 0)
+					.attr('opacity', '0.0');
 			}
 		}
 	});
