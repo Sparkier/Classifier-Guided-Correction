@@ -274,8 +274,8 @@ export default function confusionmatrix(dataset) {
 					.text(retrained_labels[label_number])
 					.style("text-anchor", "middle")
 					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * 
-																			 (total_chart_height + chart_padding)) - (chart_padding/2) - 
-																			 (total_chart_height/2)) +')');
+										(total_chart_height + chart_padding)) - (chart_padding/2) - 
+										(total_chart_height/2)) +')');
 			}
 
 			function handleMouseOver(d, i) {
@@ -287,12 +287,14 @@ export default function confusionmatrix(dataset) {
 					.attr('height', current.attr('y'));
 				d3.select('.overlayRight')
 					.attr('x', (parseInt(current.attr('x')) + parseInt(current.attr('width'))))
-					.attr('width', (main_dims.main_width - parseInt(current.attr('x')) - parseInt(current.attr('width'))))
+					.attr('width', (main_dims.main_width - parseInt(current.attr('x')) - 
+							parseInt(current.attr('width'))))
 					.attr('height', main_dims.main_height);
 				d3.select('.overlayBottom')
 					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height'))))
 					.attr('width', main_dims.main_width)
-					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - parseInt(current.attr('height'))));
+					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
+							parseInt(current.attr('height'))));
 			}
 			
 			function handleMouseOut(d, i) {
