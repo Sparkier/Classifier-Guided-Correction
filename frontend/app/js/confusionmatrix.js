@@ -245,28 +245,6 @@ export default function confusionmatrix(dataset) {
 											','+ 
 											((i + 1) * (total_chart_height + chart_padding) - chart_padding) 
 											+')');
-
-					confusion_main.append('rect')
-						.attr('x', 0)
-						.attr('y', 0)
-						.attr('width', 0)
-						.attr('height', 0)
-						.style('fill', 'grey')
-						.attr('class', 'overlayLeft');
-					confusion_main.append('rect')
-						.attr('x', 0)
-						.attr('y', 0)
-						.attr('width', 0)
-						.attr('height', 0)
-						.style('fill', 'grey')
-						.attr('class', 'overlayRight');
-					confusion_main.append('rect')
-						.attr('x', 0)
-						.attr('y', 0)
-						.attr('width', 0)
-						.attr('height', 0)
-						.style('fill', 'grey')
-						.attr('class', 'overlayBottom');
 				}
 				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
@@ -277,44 +255,9 @@ export default function confusionmatrix(dataset) {
 										(total_chart_height + chart_padding)) - (chart_padding/2) - 
 										(total_chart_height/2)) +')');
 			}
-
-			function handleMouseOver(d, i) {
-				var current = d3.select(this)
-					.style('fill', 'rgba(0,0,0,0.0)');
-
-				d3.select('.overlayLeft')
-					.attr('width', current.attr('x'))
-					.attr('height', current.attr('y'));
-				d3.select('.overlayRight')
-					.attr('x', (parseInt(current.attr('x')) + parseInt(current.attr('width'))))
-					.attr('width', (main_dims.main_width - parseInt(current.attr('x')) - 
-							parseInt(current.attr('width'))))
-					.attr('height', main_dims.main_height);
-				d3.select('.overlayBottom')
-					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height'))))
-					.attr('width', main_dims.main_width)
-					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
-							parseInt(current.attr('height'))));
-			}
-			
-			function handleMouseOut(d, i) {
-				d3.select(this)
-					.style('fill', 'rgba(0,0,0,0.1)')
-
-				d3.select('.overlayLeft')
-					.attr('width', 0)
-					.attr('height', 0);
-				d3.select('.overlayRight')
-					.attr('x', 0)
-					.attr('width', 0)
-					.attr('height', 0);
-				d3.select('.overlayBottom')
-					.attr('y', 0)
-					.attr('width', 0)
-					.attr('height', 0);
-			}
 			
 			// Visual sparation of Text and Diagram
+			// Vertical Separation Line
 			svg_confusion.append("line")
 				.attr("x1", margin.left)
 				.attr("x2", margin.left)
@@ -322,6 +265,7 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", main_dims.main_height + margin.top)
 				.attr("stroke-width", 2)
 				.attr("stroke", "black");
+			// Horizontal Separation Line
 			svg_confusion.append("line")
 				.attr("x1", 0)
 				.attr("x2", main_dims.main_width + margin.left)
@@ -329,6 +273,7 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", margin.top)
 				.attr("stroke-width", 2)
 				.attr("stroke", "black");
+			// Top Left Diagonal Line
 			svg_confusion.append("line")
 				.attr("x1", 5)
 				.attr("x2", margin.left)
@@ -336,15 +281,57 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", margin.top)
 				.attr("stroke-width", 1)
 				.attr("stroke", "black");
+			// Human Label
 			svg_confusion.append('text')
 				.text('Human')
 				.attr('transform', 'translate(' + 5 + ',' + (margin.top - 5) + ')')
 				.style("font-size", "18px");
+			// Computer Label
 			svg_confusion.append('text')
 				.text('Computer')
 				.style("text-anchor", "end")
 				.attr('transform', 'translate(' + (margin.left - 5) + ',' + 15 + ')')
 				.style("font-size", "18px");
+			// Rect for hiding top area of Numbers.
+			svg_confusion.append('rect')
+				.attr('x', 0)
+				.attr('y', margin.top + 1)
+				.attr('width', margin.left - 1)
+				.attr('height', 0)
+				.style('fill', 'white')
+				.attr('class', 'overlayLeftTop')
+				.attr('opacity', '0.8');
+			// Rect for hiding Bottom Area of Numbers.
+			svg_confusion.append('rect')
+				.attr('x', 0)
+				.attr('y', 0)
+				.attr('width', margin.left - 1)
+				.attr('height', 0)
+				.style('fill', 'white')
+				.attr('class', 'overlayLeftBottom')
+				.attr('opacity', '0.8');;
+
+			// Called when User hovers over a Cell.
+			function handleMouseOver(d, i) {
+				// Hide other Numbers
+				var current = d3.select(this);
+				d3.select('.overlayLeftTop')
+					.attr('height', current.attr('y') - 1);
+				d3.select('.overlayLeftBottom')
+					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height')) + margin.top))
+					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
+							parseInt(current.attr('height'))));
+			}
+			
+			// Called when Mouse is not over a Cell anymore.
+			function handleMouseOut(d, i) {
+				// Show all Numbers
+				d3.select('.overlayLeftTop')
+					.attr('height', 0);
+				d3.select('.overlayLeftBottom')
+					.attr('y', 0)
+					.attr('height', 0);
+			}
 		}
 	});
 };
