@@ -151,7 +151,8 @@ export default function confusionmatrix(dataset) {
 				.attr("height", main_dims.main_height);
 			// Calculate Chart properties.
 			var total_chart_height = (main_dims.main_height - ((num_classes) * chart_padding)) / num_classes;
-			var total_chart_width = (main_dims.main_width - ((num_classes) * chart_padding)) / num_classes;
+			var total_chart_width = (main_dims.main_width - ((num_classes - 1) * chart_padding)) /
+			                        (num_classes - 1);
 
 			// Scale on x-Axis for the Bars.
 			var x_scale_trainclass = d3.scaleLog().domain([0.1, max_images]).range([0, total_chart_width]);
