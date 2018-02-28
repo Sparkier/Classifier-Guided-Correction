@@ -255,6 +255,40 @@ export default function confusionmatrix(dataset) {
 																			 (total_chart_height + chart_padding)) - (chart_padding/2) - 
 																			 (total_chart_height/2)) +')');
 			}
+
+			function handleMouseOver(d, i) {
+				var current = d3.select(this)
+					.style('fill', 'rgba(0,0,0,0.0)');
+
+				d3.select('.overlayLeft')
+					.attr('width', current.attr('x'))
+					.attr('height', current.attr('y'));
+				d3.select('.overlayRight')
+					.attr('x', (parseInt(current.attr('x')) + parseInt(current.attr('width'))))
+					.attr('width', (main_dims.main_width - parseInt(current.attr('x')) - parseInt(current.attr('width'))))
+					.attr('height', main_dims.main_height);
+				d3.select('.overlayBottom')
+					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height'))))
+					.attr('width', main_dims.main_width)
+					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - parseInt(current.attr('height'))));
+			}
+			
+			function handleMouseOut(d, i) {
+				d3.select(this)
+					.style('fill', 'rgba(0,0,0,0.1)')
+
+				d3.select('.overlayLeft')
+					.attr('width', 0)
+					.attr('height', 0);
+				d3.select('.overlayRight')
+					.attr('x', 0)
+					.attr('width', 0)
+					.attr('height', 0);
+				d3.select('.overlayBottom')
+					.attr('y', 0)
+					.attr('width', 0)
+					.attr('height', 0);
+			}
 			
 			// Visual sparation of Text and Diagram
 			svg_confusion.append("line")
