@@ -232,7 +232,9 @@ export default function confusionmatrix(dataset) {
 						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
 						.attr('width', total_chart_width)
 						.attr('height', total_chart_height)
-						.style('fill', 'transparent');
+						.style('fill', 'transparent')
+						.on('mouseover', handleMouseOver)
+						.on('mouseout', handleMouseOut);
 
 					// Add Text displaying the Classification Result.
 					confusion_main.append('text')
