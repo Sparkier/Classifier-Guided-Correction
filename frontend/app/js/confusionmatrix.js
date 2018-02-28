@@ -153,7 +153,12 @@ export default function confusionmatrix(dataset) {
 			***********************************************************/
 			for (var i = 0; i < num_classes; i++) {
 				for (var j = 0; j < num_classes - 1; j++) {
-					var j_modified = (i < j) ? j + 1 : j;
+					var j_modified = (i <= j) ? j + 1 : j;
+					if(i == 1) {
+						console.log(j);
+						console.log(j_modified);
+					}
+
 					// Check for SSIM
 					var ssim_indicator = false;
 					if (ssim_buckets[i * num_classes + j_modified].max_ssim > 0.95) {
