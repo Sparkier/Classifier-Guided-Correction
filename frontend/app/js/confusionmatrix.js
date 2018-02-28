@@ -22,7 +22,7 @@ export default function confusionmatrix(dataset) {
 		};
 		var buckets = [];
 		var ssim_buckets = [];
-		var num_in_label = [];
+		var in_label = [];
 		var start_prob = 1.0 / num_classes;
 		var chart_padding = 1;
 		var max_images = 0;
@@ -36,6 +36,8 @@ export default function confusionmatrix(dataset) {
 
 		// Initialize the buckets for later use.
 		for (var i = 0; i < num_classes; i++) {
+			// Add information about how many items are in each class for that Label.
+			var classes = [];
 			for (var j = 0; j < num_classes; j++) {
 				buckets.push({
 					label: i,
@@ -50,10 +52,17 @@ export default function confusionmatrix(dataset) {
 					max_ssim: 0.0,
 					avg_ssim: 0.0
 				});
+				if(i != j) {
+					classes.push({
+						class: j,
+						number: 0
+					});
+				}
 			}
-			num_in_label.push({
+			in_label.push({
 				label: i,
-				number: 0
+				number: 0,
+				classes: classes
 			});
 		}
 
@@ -76,13 +85,24 @@ export default function confusionmatrix(dataset) {
 					curr.score_wrong += d.percentage;
 
 					// Update total number of Images for this Label.
-					num_in_label[d.label].number++;
+					in_label[d.label].number++;
+					if(d.label != d.class) {
+						// Skip label == class
+						var class_modified = (d.label <= d.class) ? d.class - 1 : d.class;
+						// Update total number of Images per Class for this Label.
+						in_label[d.label].classes[class_modified].number++;
+					}
 				}
 			});
 
-			num_in_label.sort(function(a, b) {
+			in_label.sort(function(a, b) {
 				return parseFloat(b.number) - parseFloat(a.number);
 			});
+			for (var i = 0; i < in_label.length; i++) {
+				in_label[i].classes.sort(function(a, b) {
+					return parseFloat(b.number) - parseFloat(a.number);
+				});
+			}
 
 			// Get the Maximal score_wrong for the color scaling.
 			for (var i = 0; i < buckets.length; i++) {
@@ -148,18 +168,18 @@ export default function confusionmatrix(dataset) {
 			for (var i = 0; i < num_classes; i++) {
 				for (var j = 0; j < num_classes - 1; j++) {
 					// Display Buckets sorted by total number of Items.
-					var label_number = num_in_label[i].label;
+					var label_number = in_label[i].label;
 					// Modify j so that label == class is not displayed.
-					var j_modified = (i <= j) ? j + 1 : j;
+					var class_number = in_label[i].classes[j].class
 
 					// Check for SSIM
 					var ssim_indicator = false;
-					if (ssim_buckets[j_modified * num_classes + label_number].max_ssim > 0.95) {
+					if (ssim_buckets[class_number * num_classes + label_number].max_ssim > 0.95) {
 						ssim_indicator = true;
 					}
 
 					// Get the Current Bucket with its properties.
-					var buck = buckets[j_modified * num_classes + label_number];
+					var buck = buckets[class_number * num_classes + label_number];
 					var color = 'hsl(0, 60%, 50%)';
 					var value = (buck.num_total == 0) ? 80 : 60;
 					// Only saturate when at least 0.1*score_wrong.
@@ -205,7 +225,7 @@ export default function confusionmatrix(dataset) {
 
 					// Add Hyperrefs linking to the Detail View
 					confusion_main.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + j_modified)
+						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + class_number)
 						.append('rect')
 						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
 						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
@@ -215,7 +235,7 @@ export default function confusionmatrix(dataset) {
 
 					// Add Text displaying the Classification Result.
 					confusion_main.append('text')
-						.text(retrained_labels[j_modified])
+						.text(retrained_labels[class_number])
 						.style('text_anchor', 'middle')
 						.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) - 
 											(chart_padding/2) - (total_chart_width/2)) +
