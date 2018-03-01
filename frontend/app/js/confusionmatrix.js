@@ -181,73 +181,73 @@ export default function confusionmatrix(dataset) {
 
 					// Get the Current Bucket with its properties.
 					var buck = buckets[class_number * num_classes + label_number];
-					var color = 'hsl(0, 60%, 50%)';
-					var value = (buck.num_total == 0) ? 80 : 60;
-					// Only saturate when at least 0.1*score_wrong.
-					var saturation = 0;
-					if(buck.num_total >= (score_wrong * 0.1)) {
-						saturation = color_scale(buck.score_wrong);
-					}
+					if (buck.num_total != 0) {
+						var color = 'hsl(0, 60%, 50%)';
+						var value = 60;
+						// Only saturate when at least 0.1*score_wrong.
+						var saturation = 0;
+						if(buck.num_total >= (score_wrong * 0.1)) {
+							saturation = color_scale(buck.score_wrong);
+						}
 
-					// Append a Rect for the Cell.
-					confusion_main.append('rect')
-						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
-						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
-						.attr('width', total_chart_width)
-						.attr('height', total_chart_height)
-						.style('fill', 'hsl(238, ' + saturation + '%, ' + value + '%)')
-						.attr('opacity', '0.5');
-
-					// Add bars to the Rect.
-					for (var k = parseInt((start_prob * 10)); k < 11; k++) {
+						// Append a Rect for the Cell.
 						confusion_main.append('rect')
-							// Calcualte the Position of the Rect
 							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
-							.attr('y', area_scale_y(parseFloat(k)/10.0) +
-								(i * (total_chart_height + chart_padding) + 
-								(chart_padding / 2)))
-							.attr('width', x_scale_trainclass(buck.num_images[k]))
-							.attr('height', rect_height)
-							.attr('fill', color);
+							.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
+							.attr('width', total_chart_width)
+							.attr('height', total_chart_height)
+							.style('fill', 'hsl(238, ' + saturation + '%, ' + value + '%)')
+							.attr('opacity', '0.5');
+
+						// Add bars to the Rect.
+						for (var k = parseInt((start_prob * 10)); k < 11; k++) {
+							confusion_main.append('rect')
+								// Calcualte the Position of the Rect
+								.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+								.attr('y', area_scale_y(parseFloat(k)/10.0) +
+									(i * (total_chart_height + chart_padding) + 
+									(chart_padding / 2)))
+								.attr('width', x_scale_trainclass(buck.num_images[k]))
+								.attr('height', rect_height)
+								.attr('fill', color);
+						}
+
+						// Add SSIM Indicators where appropriate.
+						if (ssim_indicator) {
+							var dim = Math.min(total_chart_width, total_chart_height)
+							confusion_main.append('svg:image')
+								.attr('xlink:href', 'api/icon/duplicates.png')
+								.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2) + 
+										((total_chart_width - dim)/2)))
+								.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2) + 
+										((total_chart_height - dim)/2)))
+								.attr('width', dim)
+								.attr('height', dim);
+						}
+
+						// Add Hyperrefs linking to the Detail View
+						confusion_main.append('a')
+							.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
+								class_number)
+							.append('rect')
+							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+							.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
+							.attr('width', total_chart_width)
+							.attr('height', total_chart_height)
+							.attr('class', class_number)
+							.attr('label', label_number)
+							.style('fill', 'transparent')
+							.on('mouseover', handleMouseOver)
+							.on('mouseout', handleMouseOut);
+
+						// Add Text displaying the Classification Result.
+						confusion_main.append('text')
+							.text(retrained_labels[class_number])
+							.style('text_anchor', 'middle')
+							.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) 
+								- (chart_padding/2) - (total_chart_width/2)) + ','+ 
+								((i + 1) * (total_chart_height + chart_padding) - chart_padding) +')');
 					}
-
-					// Add SSIM Indicators where appropriate.
-					if (ssim_indicator) {
-						var dim = Math.min(total_chart_width, total_chart_height)
-						confusion_main.append('svg:image')
-							.attr('xlink:href', 'api/icon/duplicates.png')
-							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2) + 
-							           ((total_chart_width - dim)/2)))
-							.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2) + 
-							           ((total_chart_height - dim)/2)))
-							.attr('width', dim)
-							.attr('height', dim);
-					}
-
-					// Add Hyperrefs linking to the Detail View
-					confusion_main.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
-							class_number)
-						.append('rect')
-						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
-						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
-						.attr('width', total_chart_width)
-						.attr('height', total_chart_height)
-						.attr('class', class_number)
-						.attr('label', label_number)
-						.style('fill', 'transparent')
-						.on('mouseover', handleMouseOver)
-						.on('mouseout', handleMouseOut);
-
-					// Add Text displaying the Classification Result.
-					confusion_main.append('text')
-						.text(retrained_labels[class_number])
-						.style('text_anchor', 'middle')
-						.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) - 
-											(chart_padding/2) - (total_chart_width/2)) +
-											','+ 
-											((i + 1) * (total_chart_height + chart_padding) - chart_padding) 
-											+')');
 				}
 				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
