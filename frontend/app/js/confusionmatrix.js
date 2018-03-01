@@ -226,12 +226,15 @@ export default function confusionmatrix(dataset) {
 
 					// Add Hyperrefs linking to the Detail View
 					confusion_main.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + class_number)
+						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
+							class_number)
 						.append('rect')
 						.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
 						.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
 						.attr('width', total_chart_width)
 						.attr('height', total_chart_height)
+						.attr('class', class_number)
+						.attr('label', label_number)
 						.style('fill', 'transparent')
 						.on('mouseover', handleMouseOver)
 						.on('mouseout', handleMouseOut);
@@ -248,7 +251,7 @@ export default function confusionmatrix(dataset) {
 				}
 				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
-				var t = svg_confusion.append('text')
+				svg_confusion.append('text')
 					.text(retrained_labels[label_number])
 					.style("text-anchor", "middle")
 					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * 
@@ -310,11 +313,25 @@ export default function confusionmatrix(dataset) {
 				.style('fill', 'white')
 				.attr('class', 'overlayLeftBottom')
 				.attr('opacity', '0.0');
+			svg_confusion.append('text')
+				.attr('x', 0)
+				.attr('y', (margin.top / 2))
+				.attr('class', 'textClass')
+				.attr('opacity', '0.0')
+				.style('text_anchor', 'middle')
+				.text('');
 
 			// Called when User hovers over a Cell.
 			function handleMouseOver(d, i) {
-				// Hide other Numbers
+				
 				var current = d3.select(this);
+				// Show Class Number
+				d3.select('.textClass')
+					.text(current.attr('class'))
+					.attr('x', (parseInt(current.attr('x')) + (total_chart_width/2) + margin.left))
+					.transition()
+						.attr('opacity', '1.0');
+				// Hide other Numbers
 				d3.select('.overlayLeftTop')
 					.attr('height', current.attr('y') - 1)
 					.transition()
@@ -329,6 +346,9 @@ export default function confusionmatrix(dataset) {
 			
 			// Called when Mouse is not over a Cell anymore.
 			function handleMouseOut(d, i) {
+				// Hide Class Number
+				d3.select('.textClass')
+					.attr('opacity', '0.0')
 				// Show all Numbers
 				d3.select('.overlayLeftTop')
 					.attr('height', 0)
