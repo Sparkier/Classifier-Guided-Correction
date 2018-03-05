@@ -15,7 +15,7 @@ export default function confusionmatrix(dataset) {
 
 		// Initialization Variables.
 		var margin = {
-			top: 70,
+			top: 40,
 			right: 40,
 			bottom: 35,
 			left: 100
@@ -243,7 +243,7 @@ export default function confusionmatrix(dataset) {
 						// Add Text displaying the Classification Result.
 						confusion_main.append('text')
 							.text(retrained_labels[class_number])
-							.style('text_anchor', 'middle')
+							.style('text-anchor', 'middle')
 							.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) 
 								- (chart_padding/2) - (total_chart_width/2)) + ','+ 
 								((i + 1) * (total_chart_height + chart_padding) - chart_padding) +')');
@@ -276,24 +276,16 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", margin.top)
 				.attr("stroke-width", 2)
 				.attr("stroke", "black");
-			// Top Left Diagonal Line
-			svg_confusion.append("line")
-				.attr("x1", 5)
-				.attr("x2", margin.left)
-				.attr("y1", 10)
-				.attr("y2", margin.top)
-				.attr("stroke-width", 1)
-				.attr("stroke", "black");
 			// Human Label
 			svg_confusion.append('text')
 				.text('Human')
-				.attr('transform', 'translate(' + 5 + ',' + (margin.top - 5) + ')')
+				.style('text-anchor', 'middle')
+				.attr('transform', 'translate(' + (margin.left/2) + ',' + (margin.top - 10) + ')')
 				.style("font-size", "18px");
 			// Computer Label
 			svg_confusion.append('text')
 				.text('Computer')
-				.style("text-anchor", "end")
-				.attr('transform', 'translate(' + (margin.left - 5) + ',' + 15 + ')')
+				.attr('transform', 'translate(' + (margin.left + 5) + ',' + (margin.top - 10) + ')')
 				.style("font-size", "18px");
 			// Rect for hiding top area of Numbers.
 			svg_confusion.append('rect')
@@ -313,24 +305,10 @@ export default function confusionmatrix(dataset) {
 				.style('fill', 'white')
 				.attr('class', 'overlayLeftBottom')
 				.attr('opacity', '0.0');
-			svg_confusion.append('text')
-				.attr('x', 0)
-				.attr('y', (margin.top / 2))
-				.attr('class', 'textClass')
-				.attr('opacity', '0.0')
-				.style('text_anchor', 'middle')
-				.text('');
 
 			// Called when User hovers over a Cell.
 			function handleMouseOver(d, i) {
-				
 				var current = d3.select(this);
-				// Show Class Number
-				d3.select('.textClass')
-					.text(current.attr('class'))
-					.attr('x', (parseInt(current.attr('x')) + (total_chart_width/2) + margin.left))
-					.transition()
-						.attr('opacity', '1.0');
 				// Hide other Numbers
 				d3.select('.overlayLeftTop')
 					.attr('height', current.attr('y') - 1)
@@ -346,9 +324,6 @@ export default function confusionmatrix(dataset) {
 			
 			// Called when Mouse is not over a Cell anymore.
 			function handleMouseOut(d, i) {
-				// Hide Class Number
-				d3.select('.textClass')
-					.attr('opacity', '0.0')
 				// Show all Numbers
 				d3.select('.overlayLeftTop')
 					.attr('height', 0)
