@@ -293,6 +293,22 @@ export default function confusionmatrix(dataset) {
 						.attr('height', dim);
 				}
 
+				// Add Hyperrefs linking to the Detail View
+				svg_confusion.append('a')
+					.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
+						label_number)
+					.append('rect')
+					.attr('x', 0)
+					.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
+					(chart_padding.vertical / 2) + margin.top))
+					.attr('width', total_chart_width)
+					.attr('height', total_chart_height)
+					.attr('class', label_number)
+					.attr('label', label_number)
+					.style('fill', 'transparent')
+					.on('mouseover', handleMouseOver)
+					.on('mouseout', handleMouseOut);
+
 				// Add the Label Name
 				svg_confusion.append('text')
 					.text(retrained_labels[label_number])
@@ -369,24 +385,28 @@ export default function confusionmatrix(dataset) {
 			// Called when User hovers over a Cell.
 			function handleMouseOver(d, i) {
 				var current = d3.select(this);
+				var cy = current.attr('y')
+				if(current.attr('class') == current.attr('label')) {
+					cy = cy - margin.top;
+				}
 				// Hide other Numbers
 				d3.select('.overlayLeftTop')
-					.attr('height', current.attr('y') - 1)
+					.attr('height', cy - 1)
 					.transition()
 						.attr('opacity', '0.8');
 				d3.select('.overlayLeftBottom')
-					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height')) + margin.top))
-					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
+					.attr('y', (parseInt(cy) + parseInt(current.attr('height')) + margin.top))
+					.attr('height', (main_dims.main_height - parseInt(cy) - 
 							parseInt(current.attr('height'))))
 					.transition()
 						.attr('opacity', '0.8');
 				d3.select('.overlayRightTop')
-					.attr('height', current.attr('y') - 1)
+					.attr('height', cy - 1)
 					.transition()
 						.attr('opacity', '0.8');
 				d3.select('.overlayRightBottom')
-					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height')) + margin.top))
-					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
+					.attr('y', (parseInt(cy) + parseInt(current.attr('height')) + margin.top))
+					.attr('height', (main_dims.main_height - parseInt(cy) - 
 							parseInt(current.attr('height'))))
 					.transition()
 						.attr('opacity', '0.8');
