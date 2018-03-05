@@ -347,6 +347,24 @@ export default function confusionmatrix(dataset) {
 				.style('fill', 'white')
 				.attr('class', 'overlayLeftBottom')
 				.attr('opacity', '0.0');
+			// Rect for hiding Top Right Area.
+			svg_confusion.append('rect')
+				.attr('x', margin.left + 1)
+				.attr('y', margin.top + 1)
+				.attr('width', main_dims.main_width)
+				.attr('height', 0)
+				.style('fill', 'white')
+				.attr('class', 'overlayRightTop')
+				.attr('opacity', '0.0');
+			// Rect for hiding Bottom Right Area.
+			svg_confusion.append('rect')
+				.attr('x', margin.left + 1)
+				.attr('y', 0)
+				.attr('width', main_dims.main_width)
+				.attr('height', 0)
+				.style('fill', 'white')
+				.attr('class', 'overlayRightBottom')
+				.attr('opacity', '0.0');
 
 			// Called when User hovers over a Cell.
 			function handleMouseOver(d, i) {
@@ -361,7 +379,17 @@ export default function confusionmatrix(dataset) {
 					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
 							parseInt(current.attr('height'))))
 					.transition()
-					.attr('opacity', '0.8');
+						.attr('opacity', '0.8');
+				d3.select('.overlayRightTop')
+					.attr('height', current.attr('y') - 1)
+					.transition()
+						.attr('opacity', '0.8');
+				d3.select('.overlayRightBottom')
+					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height')) + margin.top))
+					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
+							parseInt(current.attr('height'))))
+					.transition()
+						.attr('opacity', '0.8');
 			}
 			
 			// Called when Mouse is not over a Cell anymore.
@@ -371,6 +399,13 @@ export default function confusionmatrix(dataset) {
 					.attr('height', 0)
 					.attr('opacity', '0.0');
 				d3.select('.overlayLeftBottom')
+					.attr('y', 0)
+					.attr('height', 0)
+					.attr('opacity', '0.0');
+				d3.select('.overlayRightTop')
+					.attr('height', 0)
+					.attr('opacity', '0.0');
+				d3.select('.overlayRightBottom')
 					.attr('y', 0)
 					.attr('height', 0)
 					.attr('opacity', '0.0');
