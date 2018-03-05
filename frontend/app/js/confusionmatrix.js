@@ -13,9 +13,7 @@ export default function confusionmatrix(dataset) {
 			num_classes--;
 		}
 
-		/***********************************************************
-		  Start: Initialization Variables
-		***********************************************************/
+		// Initialization Variables.
 		var margin = {
 			top: 70,
 			right: 40,
@@ -24,53 +22,93 @@ export default function confusionmatrix(dataset) {
 		};
 		var buckets = [];
 		var ssim_buckets = [];
+		var in_label = [];
 		var start_prob = 1.0 / num_classes;
 		var chart_padding = 1;
 		var max_images = 0;
 		var score_wrong = 0;
 		var prob_step_size = 0.1;
-		/***********************************************************
-		  End: Initialization Variables
-		***********************************************************/
 
-		// Load the Image Classification Results
-		d3.tsv('api/train_csv/' + dataset, function(error, data) {
-			for (var i = 0; i < num_classes; i++) {
-				for (var j = 0; j < num_classes; j++) {
-					buckets.push({
-						class: i,
-						num_images: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-						label: j,
-						num_total: 0,
-						score_wrong: 0.0
+		// Main SVG Setup.
+		var chartDiv = document.getElementById('confusionContainer');
+		var svg_confusion = d3.select(chartDiv)
+			                  .append('svg')
+
+		// Initialize the buckets for later use.
+		for (var i = 0; i < num_classes; i++) {
+			// Add information about how many items are in each class for that Label.
+			var classes = [];
+			for (var j = 0; j < num_classes; j++) {
+				buckets.push({
+					label: i,
+					class: j,
+					num_images: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					num_total: 0,
+					score_wrong: 0.0
+				});
+				ssim_buckets.push({
+					label: i,
+					class: j,
+					max_ssim: 0.0,
+					avg_ssim: 0.0
+				});
+				if(i != j) {
+					classes.push({
+						class: j,
+						number: 0
 					});
 				}
 			}
+			in_label.push({
+				label: i,
+				number: 0,
+				classes: classes
+			});
+		}
 
-			/***********************************************************
-			  Start: Convert all images and sort them into Buckets
-			***********************************************************/  
+		// Load the Image Classification Results.
+		d3.tsv('api/train_csv/' + dataset, function(error, data) {
+			// Convert all images and sort them into Buckets 
 			data.forEach(function(d) {
-				d.label = +d.label;
-				d.class = +d.class;
-				d.percentage = +d.percentage;
 				d.confirmed = +d.confirmed;
-
+				// Only sort into Buckets if not already confirmed.
 				if (!d.confirmed) {
-					var curr = buckets[d.label * num_classes + d.class];
+					d.label = +d.label;
+					d.class = +d.class;
+					d.percentage = +d.percentage;
+					var curr = buckets[d.class * num_classes + d.label];
 					curr.num_images[Math.round(d.percentage * 10)]++;
 					curr.num_total++;
-					max_images = curr.num_images[Math.round(d.percentage * 10)] > max_images ? Math.round(curr.num_images[Math.round(d.percentage * 10)]) : max_images;
+					// Get the maximum number of images in one bar for the Bar Scale.
+					max_images = curr.num_images[Math.round(d.percentage * 10)] > max_images ? 
+					             Math.round(curr.num_images[Math.round(d.percentage * 10)]) : max_images;
 					curr.score_wrong += d.percentage;
+
+					// Update total number of Images for this Label.
+					in_label[d.label].number++;
+					if(d.label != d.class) {
+						// Skip label == class
+						var class_modified = (d.label <= d.class) ? d.class - 1 : d.class;
+						// Update total number of Images per Class for this Label.
+						in_label[d.label].classes[class_modified].number++;
+					}
 				}
 			});
-			/***********************************************************
-			  End: Convert all images and sort them into Buckets
-			***********************************************************/
 
+			in_label.sort(function(a, b) {
+				return parseFloat(b.number) - parseFloat(a.number);
+			});
+			for (var i = 0; i < in_label.length; i++) {
+				in_label[i].classes.sort(function(a, b) {
+					return parseFloat(b.number) - parseFloat(a.number);
+				});
+			}
+
+			// Get the Maximal score_wrong for the color scaling.
 			for (var i = 0; i < buckets.length; i++) {
 				if (buckets[i].class != buckets[i].label) {
-					score_wrong = (buckets[i].score_wrong > score_wrong) ? buckets[i].score_wrong : score_wrong;
+					score_wrong = (buckets[i].score_wrong > score_wrong) ? 
+					              buckets[i].score_wrong : score_wrong;
 				}
 			}
 
@@ -78,29 +116,9 @@ export default function confusionmatrix(dataset) {
 			get_ssim();
 		});
 
-		/***********************************************************
-		  Start: Main SVG Setup
-		***********************************************************/
-		var chartDiv = document.getElementById('confusionContainer');
-		var svg_confusion = d3.select(chartDiv)
-			.append('svg')
-		/***********************************************************
-		  End: Main SVG Setup
-		***********************************************************/
-
 		function get_ssim() {
 			// Load SSIM Results
 			d3.tsv('api/ssim_csv/' + dataset, function(error, data) {
-				for (var i = 0; i < num_classes; i++) {
-					for (var j = 0; j < num_classes; j++) {
-						ssim_buckets.push({
-							class: i,
-							label: j,
-							max_ssim: 0.0,
-							avg_ssim: 0.0
-						});
-					}
-				}
 				data.forEach(function(d) {
 					d.label = +d.label;
 					d.class = +d.class;
@@ -117,119 +135,132 @@ export default function confusionmatrix(dataset) {
 			// Extract the width and height that was computed by CSS.
 			var width = chartDiv.clientWidth;
 			var height = chartDiv.clientHeight;
+			// Initialize the SVG.
 			svg_confusion
 				.attr('width', width)
 				.attr('height', height);
+			// Get the Dimensions for the Main Group.
 			var main_dims = {
 				main_width: width - margin.left - margin.right,
 				main_height: height - margin.top - margin.bottom
 			};
+			// Initialize the Main Group
 			var confusion_main = svg_confusion.append('g')
-				.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-			confusion_main
+				.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 				.attr("width", main_dims.main_width)
 				.attr("height", main_dims.main_height);
+			// Calculate Chart properties.
 			var total_chart_height = (main_dims.main_height - ((num_classes) * chart_padding)) / num_classes;
-			var total_chart_width = (main_dims.main_width - ((num_classes) * chart_padding)) / num_classes;
+			var total_chart_width = (main_dims.main_width - ((num_classes - 1) * chart_padding)) /
+			                        (num_classes - 1);
 
-			/***********************************************************
-			  Start: Scales
-			***********************************************************/
-			// Scales in Y direction, make sure to optimize scale to number of classes
+			// Scale on x-Axis for the Bars.
 			var x_scale_trainclass = d3.scaleLog().domain([0.1, max_images]).range([0, total_chart_width]);
+			// Color Scale for the Cells.
 			var color_scale = d3.scaleLog().domain([(score_wrong * 0.1), score_wrong]).range([0, 100]);
-			// Scales for Area Functions
+			// Properties of the Matrix.
 			var num_rects = (1.0 - start_prob) / 0.1 + 1;
 			var rect_height = total_chart_height / num_rects;
-			var area_scale_y = d3.scaleLinear().domain([start_prob, 1.0]).range([total_chart_height - rect_height, 0.0]);
-			/***********************************************************
-			  End: Scales
-			***********************************************************/
+			// Scale on y Axis for Cell positions.
+			var area_scale_y = d3.scaleLinear().domain([start_prob, 1.0]).range([total_chart_height - 
+				                                                                rect_height, 0.0]);
 
-			/***********************************************************
-			  Start: Add a Rect for each Bucket
-			***********************************************************/
+			// Add Cells for each Bucket
 			for (var i = 0; i < num_classes; i++) {
-				for (var j = 0; j < num_classes; j++) {
+				for (var j = 0; j < num_classes - 1; j++) {
+					// Display Buckets sorted by total number of Items.
+					var label_number = in_label[i].label;
+					// Modify j so that label == class is not displayed.
+					var class_number = in_label[i].classes[j].class
+
 					// Check for SSIM
 					var ssim_indicator = false;
-					if (ssim_buckets[i * num_classes + j].max_ssim > 0.95) {
+					if (ssim_buckets[class_number * num_classes + label_number].max_ssim > 0.95) {
 						ssim_indicator = true;
 					}
 
-					var buck = buckets[i * num_classes + j];
-					var bucks = [];
-					var correct = (buck.label == buck.class);
-					var color = correct ? 'hsl(115, 60%, 25%)' : 'hsl(0, 60%, 50%)';
-					var value = (buck.num_total == 0) ? 80 : 60;
-					var saturation = 0;
-					if(!correct && (buck.num_total >= (score_wrong * 0.1))) {
-						saturation = color_scale(buck.score_wrong);
-					}
+					// Get the Current Bucket with its properties.
+					var buck = buckets[class_number * num_classes + label_number];
+					if (buck.num_total != 0) {
+						var color = 'hsl(0, 60%, 50%)';
+						var value = 60;
+						// Only saturate when at least 0.1*score_wrong.
+						var saturation = 0;
+						if(buck.num_total >= (score_wrong * 0.1)) {
+							saturation = color_scale(buck.score_wrong);
+						}
 
-					confusion_main.append('rect')
-						.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
-						.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2)))
-						.attr('width', total_chart_width)
-						.attr('height', total_chart_height)
-						.style('fill', 'hsl(238, ' + saturation + '%, ' + value + '%)')
-						.attr('opacity', '0.5');
-
-					for (var k = parseInt((start_prob * 10)); k < 11; k++) {
+						// Append a Rect for the Cell.
 						confusion_main.append('rect')
-							// Calcualte the Position of the Rect
-							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
-							.attr('y', area_scale_y(parseFloat(k)/10.0) + (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2)))
-							.attr('width', x_scale_trainclass(buck.num_images[k]))
-							.attr('height', rect_height)
-							.attr('fill', color);
-					}
+							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+							.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
+							.attr('width', total_chart_width)
+							.attr('height', total_chart_height)
+							.style('fill', 'hsl(238, ' + saturation + '%, ' + value + '%)')
+							.attr('opacity', '0.5');
 
-					if (ssim_indicator) {
-						var dim = Math.min(total_chart_width, total_chart_height)
-						confusion_main.append('svg:image')
-							.attr('xlink:href', 'api/icon/duplicates.png')
-							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2) + ((total_chart_width - dim)/2)))
-							.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2) + ((total_chart_height - dim)/2)))
-							.attr('width', dim)
-							.attr('height', dim);
-					}
+						// Add bars to the Rect.
+						for (var k = parseInt((start_prob * 10)); k < 11; k++) {
+							confusion_main.append('rect')
+								// Calcualte the Position of the Rect
+								.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+								.attr('y', area_scale_y(parseFloat(k)/10.0) +
+									(i * (total_chart_height + chart_padding) + 
+									(chart_padding / 2)))
+								.attr('width', x_scale_trainclass(buck.num_images[k]))
+								.attr('height', rect_height)
+								.attr('fill', color);
+						}
 
-					confusion_main.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + i + '&class=' + j)
-						.append('rect')
-						.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2)))
-						.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2)))
-						.attr('width', total_chart_width)
-						.attr('height', total_chart_height)
-						.style('fill', 'transparent');
+						// Add SSIM Indicators where appropriate.
+						if (ssim_indicator) {
+							var dim = Math.min(total_chart_width, total_chart_height)
+							confusion_main.append('svg:image')
+								.attr('xlink:href', 'api/icon/duplicates.png')
+								.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2) + 
+										((total_chart_width - dim)/2)))
+								.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2) + 
+										((total_chart_height - dim)/2)))
+								.attr('width', dim)
+								.attr('height', dim);
+						}
+
+						// Add Hyperrefs linking to the Detail View
+						confusion_main.append('a')
+							.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
+								class_number)
+							.append('rect')
+							.attr('x', (j * (total_chart_width + chart_padding) + (chart_padding / 2)))
+							.attr('y', (i * (total_chart_height + chart_padding) + (chart_padding / 2)))
+							.attr('width', total_chart_width)
+							.attr('height', total_chart_height)
+							.attr('class', class_number)
+							.attr('label', label_number)
+							.style('fill', 'transparent')
+							.on('mouseover', handleMouseOver)
+							.on('mouseout', handleMouseOut);
+
+						// Add Text displaying the Classification Result.
+						confusion_main.append('text')
+							.text(retrained_labels[class_number])
+							.style('text_anchor', 'middle')
+							.attr('transform', 'translate('+ (((j + 1) * (total_chart_width + chart_padding)) 
+								- (chart_padding/2) - (total_chart_width/2)) + ','+ 
+								((i + 1) * (total_chart_height + chart_padding) - chart_padding) +')');
+					}
 				}
-			}
-			/***********************************************************
-			  End: Add a Rect for each Bucket
-			***********************************************************/
-
-			/***********************************************************
-			  Start: Diagram Axes for each Class and Diagram Heading
-			***********************************************************/
-			for (var i = 0; i < num_classes; i++) {
+				// Diagram Axes for each Class and Diagram Heading.
 				// Add the Label Name
-				var t = svg_confusion.append('text')
-					.text(retrained_labels[i])
-					.style("text-anchor", "middle")
-					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * (total_chart_height + chart_padding)) - (chart_padding/2) - (total_chart_height/2)) +')');
-				// Add the Class Name
 				svg_confusion.append('text')
-					.text(retrained_labels[i])
-					.attr('transform', 'translate('+ (margin.left + ((i + 1) * (total_chart_width + chart_padding)) - (chart_padding/2) - (total_chart_width/2)) +','+ 65 +'), rotate(-30)');
+					.text(retrained_labels[label_number])
+					.style("text-anchor", "middle")
+					.attr('transform', 'translate('+ (margin.left/2) +','+ (margin.top + ((i + 1) * 
+										(total_chart_height + chart_padding)) - (chart_padding/2) - 
+										(total_chart_height/2)) +')');
 			}
-			/***********************************************************
-			  End: Diagram Axes for each Class and Diagram Heading
-			***********************************************************/
 			
-			/***********************************************************
-			  Start: Sparation of Text and Diagram
-			***********************************************************/
+			// Visual sparation of Text and Diagram
+			// Vertical Separation Line
 			svg_confusion.append("line")
 				.attr("x1", margin.left)
 				.attr("x2", margin.left)
@@ -237,6 +268,7 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", main_dims.main_height + margin.top)
 				.attr("stroke-width", 2)
 				.attr("stroke", "black");
+			// Horizontal Separation Line
 			svg_confusion.append("line")
 				.attr("x1", 0)
 				.attr("x2", main_dims.main_width + margin.left)
@@ -244,6 +276,7 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", margin.top)
 				.attr("stroke-width", 2)
 				.attr("stroke", "black");
+			// Top Left Diagonal Line
 			svg_confusion.append("line")
 				.attr("x1", 5)
 				.attr("x2", margin.left)
@@ -251,18 +284,80 @@ export default function confusionmatrix(dataset) {
 				.attr("y2", margin.top)
 				.attr("stroke-width", 1)
 				.attr("stroke", "black");
+			// Human Label
 			svg_confusion.append('text')
 				.text('Human')
 				.attr('transform', 'translate(' + 5 + ',' + (margin.top - 5) + ')')
 				.style("font-size", "18px");
+			// Computer Label
 			svg_confusion.append('text')
 				.text('Computer')
 				.style("text-anchor", "end")
 				.attr('transform', 'translate(' + (margin.left - 5) + ',' + 15 + ')')
 				.style("font-size", "18px");
-			/***********************************************************
-			  End: Sparation of Text and Diagram
-			***********************************************************/
+			// Rect for hiding top area of Numbers.
+			svg_confusion.append('rect')
+				.attr('x', 0)
+				.attr('y', margin.top + 1)
+				.attr('width', margin.left - 1)
+				.attr('height', 0)
+				.style('fill', 'white')
+				.attr('class', 'overlayLeftTop')
+				.attr('opacity', '0.0');
+			// Rect for hiding Bottom Area of Numbers.
+			svg_confusion.append('rect')
+				.attr('x', 0)
+				.attr('y', 0)
+				.attr('width', margin.left - 1)
+				.attr('height', 0)
+				.style('fill', 'white')
+				.attr('class', 'overlayLeftBottom')
+				.attr('opacity', '0.0');
+			svg_confusion.append('text')
+				.attr('x', 0)
+				.attr('y', (margin.top / 2))
+				.attr('class', 'textClass')
+				.attr('opacity', '0.0')
+				.style('text_anchor', 'middle')
+				.text('');
+
+			// Called when User hovers over a Cell.
+			function handleMouseOver(d, i) {
+				
+				var current = d3.select(this);
+				// Show Class Number
+				d3.select('.textClass')
+					.text(current.attr('class'))
+					.attr('x', (parseInt(current.attr('x')) + (total_chart_width/2) + margin.left))
+					.transition()
+						.attr('opacity', '1.0');
+				// Hide other Numbers
+				d3.select('.overlayLeftTop')
+					.attr('height', current.attr('y') - 1)
+					.transition()
+						.attr('opacity', '0.8');
+				d3.select('.overlayLeftBottom')
+					.attr('y', (parseInt(current.attr('y')) + parseInt(current.attr('height')) + margin.top))
+					.attr('height', (main_dims.main_height - parseInt(current.attr('y')) - 
+							parseInt(current.attr('height'))))
+					.transition()
+					.attr('opacity', '0.8');
+			}
+			
+			// Called when Mouse is not over a Cell anymore.
+			function handleMouseOut(d, i) {
+				// Hide Class Number
+				d3.select('.textClass')
+					.attr('opacity', '0.0')
+				// Show all Numbers
+				d3.select('.overlayLeftTop')
+					.attr('height', 0)
+					.attr('opacity', '0.0');
+				d3.select('.overlayLeftBottom')
+					.attr('y', 0)
+					.attr('height', 0)
+					.attr('opacity', '0.0');
+			}
 		}
 	});
 };
