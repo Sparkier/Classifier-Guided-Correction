@@ -4,7 +4,7 @@ import detailview from './detailview'
 import $ from 'jquery'
 
 $(() => {
-    var dataset = 'cifar10';
+    var dataset = 'mnist';
     var location = window.location.href.toString().split(window.location.host)[1];
     
     if (location == '/') {

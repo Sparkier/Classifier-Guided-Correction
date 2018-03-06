@@ -153,7 +153,6 @@ export function append(dataset, image, number, num_per_line) {
     oImg.scaleToWidth(28);
     oImg.scaleToHeight(28);
     oImg.on('selected', function() {
-      console.log(image.name);
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
       update_data(selected_probs, selected_paths);
