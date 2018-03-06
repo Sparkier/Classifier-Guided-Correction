@@ -183,8 +183,6 @@ export default function confusionmatrix(dataset) {
 					// Get the Current Bucket with its properties.
 					var buck = buckets[class_number * num_classes + label_number];
 					if (buck.num_total != 0) {
-						var color = 'hsl(0, 60%, 50%)';
-						var value = 60;
 						// Only saturate when at least 0.1*score_wrong.
 						var saturation = 0;
 						if(buck.num_total >= (score_wrong * 0.1)) {
@@ -211,7 +209,7 @@ export default function confusionmatrix(dataset) {
 								(chart_padding.vertical / 2)))
 							.attr('width', total_chart_width)
 							.attr('height', total_chart_height)
-							.style('fill', 'hsl(238, ' + saturation + '%, ' + value + '%)')
+							.style('fill', 'hsl(238, ' + saturation + '%, ' + 60 + '%)')
 							.attr('opacity', '0.5');
 
 						// Add bars to the Rect.
@@ -225,7 +223,7 @@ export default function confusionmatrix(dataset) {
 									(chart_padding.vertical / 2)))
 								.attr('width', x_scale_trainclass(buck.num_images[k]))
 								.attr('height', rect_height)
-								.attr('fill', color);
+								.attr('fill', 'hsl(0, 60%, 50%)');
 						}
 
 						// Add SSIM Indicators where appropriate.
@@ -288,7 +286,7 @@ export default function confusionmatrix(dataset) {
 					(chart_padding.vertical / 2) + margin.top))
 					.attr('width', total_chart_width)
 					.attr('height', total_chart_height)
-					.style('fill', 'hsl(238, ' + 0 + '%, ' + 80 + '%)')
+					.style('fill', 'hsl(238, ' + 0 + '%, ' + 60 + '%)')
 					.attr('opacity', '0.5');
 
 				// Add Histogram Bars
