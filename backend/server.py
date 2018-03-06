@@ -93,6 +93,15 @@ def labels_txt(dataset):
                      as_attachment=True)
 
 
+@app.route('/representative/<dataset>/<label>')
+def representative(dataset, label):
+    image_location = (data_location + dataset + '/representative/' + label + '.jpg')
+    return send_file(image_location,
+                     mimetype='image/jpeg',
+                     attachment_filename='image.jpeg',
+                     as_attachment=True)
+
+
 @app.route('/image/<dataset>/<part>/<label>/<image>')
 def image(dataset, part, label, image):
     image_location = (data_location + dataset + '/' + part +

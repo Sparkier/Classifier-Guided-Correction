@@ -191,6 +191,18 @@ export default function confusionmatrix(dataset) {
 							saturation = color_scale(buck.score_wrong);
 						}
 
+						// Add Background Images
+						confusion_main.append("svg:image")
+							.attr('x', (j * (total_chart_width + chart_padding.horizontal) + 
+							(chart_padding.horizontal / 2)))
+							.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
+							(chart_padding.vertical / 2)))
+							.attr('width', total_chart_width)
+							.attr('height', total_chart_height)
+							.attr("xlink:href", "api/representative/" + dataset + "/" + 
+								retrained_labels[class_number])
+							.attr('opacity', '0.5');
+
 						// Append a Rect for the Cell.
 						confusion_main.append('rect')
 							.attr('x', (j * (total_chart_width + chart_padding.horizontal) + 
@@ -257,16 +269,27 @@ export default function confusionmatrix(dataset) {
 					}
 				}
 				// Add Cells on left for correct Buckets
+				// Add Background Images
+				svg_confusion.append("svg:image")
+					.attr('x', 0)
+					.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
+					(chart_padding.vertical / 2) + margin.top))
+					.attr('width', total_chart_width)
+					.attr('height', total_chart_height)
+					.attr("xlink:href", "api/representative/" + dataset + "/" + 
+						retrained_labels[label_number])
+					.attr('opacity', '0.5');
+
 				// Add Rects
 				var buck = buckets[i * num_classes + i];
 				svg_confusion.append('rect')
-						.attr('x', 0)
-						.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
-						(chart_padding.vertical / 2) + margin.top))
-						.attr('width', total_chart_width)
-						.attr('height', total_chart_height)
-						.style('fill', 'hsl(238, ' + 0 + '%, ' + 80 + '%)')
-						.attr('opacity', '0.5');
+					.attr('x', 0)
+					.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
+					(chart_padding.vertical / 2) + margin.top))
+					.attr('width', total_chart_width)
+					.attr('height', total_chart_height)
+					.style('fill', 'hsl(238, ' + 0 + '%, ' + 80 + '%)')
+					.attr('opacity', '0.5');
 
 				// Add Histogram Bars
 				for (var k = parseInt((start_prob * 10)); k < 11; k++) {
