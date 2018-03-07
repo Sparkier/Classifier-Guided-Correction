@@ -19,7 +19,7 @@ export default function confusionmatrix(dataset) {
 		var in_label = [];
 		var start_prob = 1.0 / num_classes;
 		var chart_padding = {
-			vertical: 150/num_classes,
+			vertical: 200/num_classes,
 			horizontal: 1
 		};
 		var max_images = 0;
@@ -137,9 +137,9 @@ export default function confusionmatrix(dataset) {
 			// Calculate the Margins
 			var margin = {
 				top: 40,
-				right: 40,
-				bottom: 35,
-				left: ((width - 40) / num_classes)
+				right: 0,
+				bottom: 0,
+				left: (width / num_classes)
 			};
 			// Initialize the SVG.
 			svg_confusion
@@ -364,7 +364,8 @@ export default function confusionmatrix(dataset) {
 			// Computer Label
 			svg_confusion.append('text')
 				.text('Computer')
-				.attr('transform', 'translate(' + (margin.left + 5) + ',' + (margin.top - 10) + ')')
+				.style('text-anchor', 'middle')
+				.attr('transform', 'translate(' + (margin.left + (total_chart_width/2)) + ',' + (margin.top - 10) + ')')
 				.style("font-size", "18px");
 			// Rect for hiding top area of Numbers.
 			svg_confusion.append('rect')
