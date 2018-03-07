@@ -189,3 +189,7 @@ typings/
 *.css.map
 
 # End of https://www.gitignore.io/api/emacs,node,sass
+
+
+__pycache__
+.eslintrc.js

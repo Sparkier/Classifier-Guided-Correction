@@ -7,6 +7,7 @@ var canvas;
 var canvas_ssim;
 var selected_paths = [];
 var selected_probs = [];
+
 export function load_images(dataset, images, num_images, correct) {
   // Create the Canvas Element
   var newCanvas = document.createElement("canvas");
@@ -59,7 +60,6 @@ export function load_images(dataset, images, num_images, correct) {
       switch (mode) {
         case 1:
           return parseFloat(b.percentage) - parseFloat(a.percentage);
-          break;
       }
     });
 
@@ -103,12 +103,34 @@ export function load_images_SSIM(dataset, ssim, all_images) {
   var num_pairs = Math.floor(width / 80);
   var pairs = ssim.slice(0, num_pairs);
 
-  for (var i = 0; i < pairs.length; i++) {
+  // Once a pair has been skipped, this offset comes into play.
+  var i_offset = 0;
+  // Add as many pairs as fitting into view.
+  for (var i = 0; i < num_pairs; i++) {
+    var found_images = [];
+    // Add two images for each pair.
     for (var j = 0; j < 2; j++) {
       for (var k = 0; k < all_images.length; k++) {
-        if (pairs[i][j+2] == all_images[k].name) {
-          appendSSIM(dataset, all_images[k], i, j);
+        if (ssim[i][j+2] == all_images[k].name) {
+          // When the images was found, add it.
+          found_images.push(all_images[k]);
         }
+      }
+    }
+    // Check if both images were found.
+    if(found_images.length == 2) {
+      // Add them to the view.
+      for (var j = 0; j < found_images.length; j++) {
+        appendSSIM(dataset, found_images[j], i - i_offset, j);
+      }
+    } else {
+      // Check if list exceeded
+      if(num_pairs > ssim.length) {
+        num_pairs = 0;
+      } else {
+        // Go further (a pair has been skipped).
+        num_pairs = num_pairs + 1;
+        i_offset = i_offset + 1;
       }
     }
   }
@@ -131,7 +153,6 @@ export function append(dataset, image, number, num_per_line) {
     oImg.scaleToWidth(28);
     oImg.scaleToHeight(28);
     oImg.on('selected', function() {
-      console.log(image.name);
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
       update_data(selected_probs, selected_paths);
