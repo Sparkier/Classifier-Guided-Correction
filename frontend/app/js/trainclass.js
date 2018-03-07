@@ -85,10 +85,7 @@ export default function trainclass(dataset, label, classification) {
 					d.name = d.name;
 					d.probabilities = JSON.parse(d.probabilities);
 					d.confirmed = +d.confirmed;
-					d.distance_grey = +d.distance_grey;
-					d.distance_hue = +d.distance_hue;
 					d.distance_saliency_hue = +d.distance_saliency_hue;
-					d.tsne_unprocessed = JSON.parse(d.tsne_unprocessed);
 					d.tsne_saliency = JSON.parse(d.tsne_saliency);
 					var correct_class = (d.label == d.class) ? true : false
 
