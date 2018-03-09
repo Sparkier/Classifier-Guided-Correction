@@ -5,8 +5,19 @@ import {
 } from './images'
 import $ from 'jquery';
 const d3 = require('d3');
+import * as browserStore from 'storejs';
 
 export default function trainclass(dataset, label, classification) {
+	var participant_id = browserStore.get('participant_id');
+	if(participant_id === undefined) {
+        $.ajax({
+            method: 'GET',
+            url: '/api/participant_id/' + dataset
+        }).done((data) => {
+            browserStore.set('participant_id', data.participant_id);
+        });
+	}
+	
 	// Get the Classes from the text File that was used for training the labels
 	d3.text('api/labels_txt/' + dataset, function(error, retrained_labels) {
 		var correct = false;
@@ -73,7 +84,7 @@ export default function trainclass(dataset, label, classification) {
 		***********************************************************/
 
 		// Load the Image Classification Results
-		d3.tsv('api/train_csv/' + dataset, function(error, data) {
+		d3.tsv('api/train_csv/' + dataset + '/' + participant_id, function(error, data) {
 			// Convert all Items  
 			data.forEach(function(d) {
 				// image,label,class,percentage

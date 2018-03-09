@@ -1,27 +1,58 @@
 import trainclass from './trainclass';
 import confusionmatrix from './confusionmatrix';
 import detailview from './detailview';
+import demographics from './demographics'
 import $ from 'jquery';
 import * as browserStore from 'storejs';
+import 'clientjs';
 
 $(() => {
-    var dataset = 'axxor';
+    const client = new ClientJS();
+    var dataset = 'cifar10_test';
     var location = window.location.href.toString().split(window.location.host)[1];
-    
-    $.ajax({
-        method: 'GET',
-        url: '/api/participant_id'
-    }).done((data) => {
-        browserStore.set('participant_id', data.participant_id);
-    });
-    
-    if (location == '/') {
-        confusionmatrix(dataset);
+    const participant_id = browserStore.get('participant_id');
+
+    if(participant_id === undefined) {
+        $.ajax({
+            method: 'GET',
+            url: '/api/participant_id/' + dataset
+        }).done((data) => {
+            browserStore.set('participant_id', data.participant_id);
+            storeBrowserInfo(data.participant_id);
+        });
     } else {
-        var label = findGetParameter('label');
-        var classification = findGetParameter('class');
-        trainclass(dataset, label, classification);
-        detailview(dataset, label, classification);
+        dispatch();
+    }
+
+    const storeBrowserInfo = (id) => {
+        const browserInfo = client.getBrowserData();
+        const fingerprint = client.getFingerprint();
+    
+        $.ajax({
+            method: 'PUT',
+            url: '/api/client_information/' + dataset + '/' + id,
+            data: JSON.stringify({
+                participant_id: id,
+                browserInfo,
+                fingerprint
+            }),
+            contentType: 'application/json'
+        }).done(() => {
+            dispatch();
+        });
+    };    
+    
+    function dispatch() {
+        if (location == '/demographics.html') {
+            demographics(dataset);
+        } else if (location == '/confusion.html') {
+            confusionmatrix(dataset);
+        } else {
+            var label = findGetParameter('label');
+            var classification = findGetParameter('class');
+            trainclass(dataset, label, classification);
+            detailview(dataset, label, classification);
+        }
     }
 
     function findGetParameter(parameterName) {

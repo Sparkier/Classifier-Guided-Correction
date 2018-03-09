@@ -4,9 +4,13 @@ import os
 import re_tsne as rt
 import uuid
 from flask import jsonify
+from shutil import copyfile
+import json
 
 app = Flask(__name__)
 data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
+ok_status = 200
+json_type = {'ContentType': 'application/json'}
 
 
 def get_labels(dataset):
@@ -28,7 +32,7 @@ def should_move(dataset, location, label):
     if old_location == new_location:
         return location
     else:
-        move(old_location, new_location)
+        #move(old_location, new_location)
         return new_name
 
 
@@ -62,9 +66,10 @@ def re_tsne(jsdata, lbl, classification, dataset):
     return new_vals
 
 
-@app.route('/train_csv/<dataset>')
-def train_csv(dataset):
-    return send_file(data_location + dataset + '/train_images.csv',
+@app.route('/train_csv/<dataset>/<participant_id>')
+def train_csv(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    return send_file(os.path.join(new_loc, 'train_images.csv'),
                      mimetype='text/csv',
                      attachment_filename='train_images.csv',
                      as_attachment=True)
@@ -123,19 +128,18 @@ def icon(name):
                      as_attachment=True)
 
 
-@app.route('/modify_csv/<dataset>/<lbl>/<classification>', methods=['POST'])
-def modify_csv(dataset, lbl, classification):
+@app.route('/modify_csv/<dataset>/<lbl>/<classification>/<participant_id>', methods=['POST'])
+def modify_csv(dataset, lbl, classification, participant_id):
     jsdata = request.get_json()
     new_tsne = re_tsne(jsdata, lbl, classification, (data_location + dataset))
     labels = get_labels(dataset)
 
     # Write Classification Results into CSV File
-    output_file = data_location + dataset + '/train_images.csv'
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    output_file = os.path.join(new_loc, 'train_images.csv')
     test_writer = csv.writer(open(output_file, 'w'), delimiter='\t')
     test_writer.writerow(['image', 'label', 'class', 'percentage', 'name',
-                          'probabilities', 'confirmed', 'distance_grey',
-                          'distance_hue', 'distance_saliency_hue',
-                          'tsne_unprocessed', 'tsne_saliency'])
+                          'probabilities', 'confirmed', 'tsne_saliency'])
     image_number = 0
     while image_number < len(jsdata):
         current = jsdata[image_number]
@@ -146,10 +150,6 @@ def modify_csv(dataset, lbl, classification):
         name = current['name']
         probabilities = current['probabilities']
         confirmed = current['confirmed']
-        distance_grey = current['distance_grey']
-        distance_hue = current['distance_hue']
-        distance_saliency_hue = current['distance_saliency_hue']
-        tsne_unprocessed = current['tsne_unprocessed']
         tsne_saliency = current['tsne_saliency']
         for t in new_tsne:
             if (t[0]['name'] == name):
@@ -157,25 +157,22 @@ def modify_csv(dataset, lbl, classification):
         label_txt = labels[int(label)]
         name = should_move(dataset, name, label_txt)
         test_writer.writerow([image, label, clas, percentage, name,
-                              probabilities, confirmed, distance_grey,
-                              distance_hue, distance_saliency_hue,
-                              tsne_unprocessed, tsne_saliency])
+                              probabilities, confirmed, tsne_saliency])
         image_number = image_number + 1
     return ('', 204)
 
 
-@app.route('/modify_delete/<dataset>/<lbl>/<classification>', methods=['POST'])
-def modify_delete(dataset, lbl, classification):
+@app.route('/modify_delete/<dataset>/<lbl>/<classification>/<participant_id>', methods=['POST'])
+def modify_delete(dataset, lbl, classification, participant_id):
     jsdata = request.get_json()
     new_tsne = re_tsne(jsdata, lbl, classification, (data_location + dataset))
 
     # Write Classification Results into CSV File
-    output_file = data_location + dataset + '/train_images.csv'
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    output_file = os.path.join(new_loc, 'train_images.csv')
     test_writer = csv.writer(open(output_file, 'w'), delimiter='\t')
     test_writer.writerow(['image', 'label', 'class', 'percentage', 'name',
-                          'probabilities', 'confirmed', 'distance_grey',
-                          'distance_hue', 'distance_saliency_hue',
-                          'tsne_unprocessed', 'tsne_saliency'])
+                          'probabilities', 'confirmed', 'tsne_saliency'])
     image_number = 0
     while image_number < len(jsdata):
         current = jsdata[image_number]
@@ -186,30 +183,59 @@ def modify_delete(dataset, lbl, classification):
         name = current['name']
         probabilities = current['probabilities']
         confirmed = current['confirmed']
-        distance_grey = current['distance_grey']
-        distance_hue = current['distance_hue']
-        distance_saliency_hue = current['distance_saliency_hue']
-        tsne_unprocessed = current['tsne_unprocessed']
         tsne_saliency = current['tsne_saliency']
         for t in new_tsne:
             if (t[0]['name'] == name):
                 tsne_saliency = t[1]
-        if should_delete(confirmed):
-            remove(dataset, name)
-        else:
+        if not should_delete(confirmed):
             test_writer.writerow([image, label, clas, percentage, name,
-                                  probabilities, confirmed, distance_grey,
-                                  distance_hue, distance_saliency_hue,
-                                  tsne_unprocessed, tsne_saliency])
+                                  probabilities, confirmed, tsne_saliency])
+        # else:
+            # remove(dataset, name)
+            
         image_number = image_number + 1
     return ('', 204)
 
 
-@app.route('/participant_id', methods=['GET'])
-def gen_participant_id():
+@app.route('/participant_id/<dataset>', methods=['GET'])
+def gen_participant_id(dataset):
     new_participant_id = str(uuid.uuid4())
-
+    new_loc = os.path.join(data_location, dataset, new_participant_id)
+    if not os.path.exists(new_loc):
+        os.makedirs(new_loc)
+    copyfile(os.path.join(data_location, dataset, 'train_images.csv'), 
+            os.path.join(new_loc, 'train_images.csv'))
+    
     return jsonify({'participant_id': new_participant_id})
 
+
+@app.route('/client_information/<dataset>/<participant_id>', methods=['PUT'])
+def client_info(dataset, participant_id):
+    doc = request.get_json(silent=True)
+    
+    with open(os.path.join(data_location, dataset, participant_id, 'client_info.json'), 'w') as outfile:
+        json.dump(doc, outfile)
+
+    result = jsonify({'success': True})
+    return result, ok_status, json_type
+
+
+@app.route('/demographics_survey/', methods=['GET'])
+def demographics_survey():
+    with open('demographics.json') as json_data:
+        d = json.load(json_data)
+        return jsonify(d)
+
+
+@app.route('/client_demographics/<dataset>/<participant_id>', methods=['PUT'])
+def client_demographics(dataset, participant_id):
+    doc = request.get_json(silent=True)
+    
+    with open(os.path.join(data_location, dataset, participant_id, 'client_demographics.json'), 
+        'w') as outfile:
+        json.dump(doc, outfile)
+
+    result = jsonify({'success': True})
+    return result, ok_status, json_type
 
 app.run(debug=True)
