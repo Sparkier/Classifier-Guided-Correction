@@ -223,7 +223,7 @@ export default function confusionmatrix(dataset) {
 									(chart_padding.vertical / 2)))
 								.attr('width', x_scale_trainclass(buck.num_images[k]))
 								.attr('height', rect_height)
-								.attr('fill', 'hsl(0, 60%, 50%)');
+								.attr('fill', '#A32638');
 						}
 
 						// Add SSIM Indicators where appropriate.
@@ -252,7 +252,7 @@ export default function confusionmatrix(dataset) {
 							.attr('height', total_chart_height)
 							.attr('class', class_number)
 							.attr('label', label_number)
-							.style('fill', 'transparent')
+							.attr('opacity', '0')
 							.on('mouseover', handleMouseOver)
 							.on('mouseout', handleMouseOut);
 
@@ -298,7 +298,7 @@ export default function confusionmatrix(dataset) {
 							chart_padding.vertical) + (chart_padding.vertical / 2)) + margin.top)
 						.attr('width', x_scale_trainclass(buck.num_images[k]))
 						.attr('height', rect_height)
-						.attr('fill', 'hsl(115, 60%, 25%)');
+						.attr('fill', '#24740B');
 				}
 
 				// Add SSIM Indicator if neccessary.
@@ -326,7 +326,7 @@ export default function confusionmatrix(dataset) {
 					.attr('height', total_chart_height)
 					.attr('class', label_number)
 					.attr('label', label_number)
-					.style('fill', 'transparent')
+					.attr('opacity', '0.0')
 					.on('mouseover', handleMouseOver)
 					.on('mouseout', handleMouseOut);
 

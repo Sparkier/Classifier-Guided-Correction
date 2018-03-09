@@ -35,7 +35,7 @@ export default function trainclass(dataset, label, classification) {
 			left: 70
 		};
 
-		var myNode = document.getElementById('imContainer');
+		var myNode = document.getElementById('rightSection');
 		var width = myNode.clientWidth;
 		var rect_size = {
 			width: 12,
@@ -62,7 +62,7 @@ export default function trainclass(dataset, label, classification) {
 		***********************************************************/
 		var svg_trainclass = d3.select('#trainclassContainer')
 			.append('svg')
-			.attr('width', totalWidth)
+			.attr('width', width)
 			.attr('height', totalHeight);
 
 		// Main Group for this SVG
@@ -205,6 +205,7 @@ export default function trainclass(dataset, label, classification) {
 					return d.num_images;
 				})
 				.style("font-size", "12px")
+				.style("fill", "white")				
 				.style("pointer-events", "none");
 			/***********************************************************
 				End: Add a Rect and Text for each Bucket

@@ -9,6 +9,8 @@
     "gulp-sourcemaps": "^2.6.1",
     "jquery": "^3.2.1",
     "jshint": "^2.9.5",
+    "store": "^2.0.12",
+    "storejs": "^1.0.16",
     "vinyl-buffer": "^1.0.0"
   },
   "devDependencies": {

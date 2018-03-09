@@ -1,11 +1,19 @@
 import trainclass from './trainclass';
-import confusionmatrix from './confusionmatrix'
-import detailview from './detailview'
-import $ from 'jquery'
+import confusionmatrix from './confusionmatrix';
+import detailview from './detailview';
+import $ from 'jquery';
+import * as browserStore from 'storejs';
 
 $(() => {
-    var dataset = 'mnist';
+    var dataset = 'axxor';
     var location = window.location.href.toString().split(window.location.host)[1];
+    
+    $.ajax({
+        method: 'GET',
+        url: '/api/participant_id'
+    }).done((data) => {
+        browserStore.set('participant_id', data.participant_id);
+    });
     
     if (location == '/') {
         confusionmatrix(dataset);

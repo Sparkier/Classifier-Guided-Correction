@@ -2,6 +2,8 @@ from flask import Flask, send_file, request
 import csv
 import os
 import re_tsne as rt
+import uuid
+from flask import jsonify
 
 app = Flask(__name__)
 data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
@@ -201,6 +203,13 @@ def modify_delete(dataset, lbl, classification):
                                   tsne_unprocessed, tsne_saliency])
         image_number = image_number + 1
     return ('', 204)
+
+
+@app.route('/participant_id', methods=['GET'])
+def gen_participant_id():
+    new_participant_id = str(uuid.uuid4())
+
+    return jsonify({'participant_id': new_participant_id})
 
 
 app.run(debug=True)

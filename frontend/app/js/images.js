@@ -155,6 +155,7 @@ export function append(dataset, image, number, num_per_line) {
     oImg.on('selected', function() {
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
+      console.log(image.name)
       update_data(selected_probs, selected_paths);
     });
     oImg.on('deselected', function() {
