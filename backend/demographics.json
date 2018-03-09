@@ -1,0 +1,78 @@
+{ "title": "Demographics Questions", "showProgressBar": "top", "pages": [
+    {"questions": [
+        {
+            "type": "radiogroup",
+            "name": "gender",
+            "title": "What is your gender?",
+            "isRequired": true,
+            "colCount": 0,
+            "choices": [
+                "Male",
+                "Female",
+                "Other"
+            ]
+        },
+        {
+            "type": "text",
+            "name": "age",
+            "title": "What is your age?",
+            "isRequired": true,
+            "validators": [
+                {
+                    "type": "numeric",
+                    "minValue": 1,
+                    "maxValue": 120
+                }
+            ]
+        }
+    ]},
+    {"questions": [
+        {
+            "type": "dropdown",
+            "name": "degree",
+            "title": "What is your highest degree?",
+            "isRequired": true,
+            "colCount": 0,
+            "choices": [
+                "Less than a high school diploma",
+                "High school graduate (includes equivalency)",
+                "Some college, no degree",
+                "Associate degree",
+                "Bachelor's degree",
+                "Master's degree",
+                "Doctorate"
+            ]
+        },
+        {
+            "type": "dropdown",
+            "name": "employment",
+            "title": "What is your current employment state?",
+            "isRequired": true,
+            "colCount": 0,
+            "choices": [
+                "Employed",
+                "Unemployed",
+                "Student",
+                "Retired",
+                "Self-employed",
+                "Something else"
+            ]
+        },
+        {
+            "type": "dropdown",
+            "name": "profession",
+            "title": "What is your profession?",
+            "isRequired": true,
+            "colCount": 0,
+            "choices": [
+                "Engineering / Computer Science",
+                "Medicine / Psychology",
+                "Mathematics / Physics",
+                "Chemistry / Biology",
+                "other"
+            ]
+        }
+    ]}
+],
+"completedHtml": "<p><h4>First step completed.</h4></p><p>You will now get an introduction into the usage of our tool. Then you will have 15 minutes to correct the data.</p><p>You will be redirected shortly.</p>"
+}
