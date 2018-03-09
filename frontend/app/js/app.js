@@ -2,6 +2,7 @@ import trainclass from './trainclass';
 import confusionmatrix from './confusionmatrix';
 import detailview from './detailview';
 import demographics from './demographics'
+import survey from './survey'
 import $ from 'jquery';
 import * as browserStore from 'storejs';
 import 'clientjs';
@@ -46,7 +47,12 @@ $(() => {
         if (location == '/demographics.html') {
             demographics(dataset);
         } else if (location == '/confusion.html') {
+            setTimeout(function () {
+                window.location.href = "survey.html"; //will redirect to your blog page (an ex: blog.html)
+            }, 900000); //will call the function after 2 secs.
             confusionmatrix(dataset);
+        } else if (location == '/survey.html') {
+            survey(dataset);
         } else {
             var label = findGetParameter('label');
             var classification = findGetParameter('class');

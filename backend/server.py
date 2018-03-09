@@ -238,4 +238,23 @@ def client_demographics(dataset, participant_id):
     result = jsonify({'success': True})
     return result, ok_status, json_type
 
+
+@app.route('/survey/', methods=['GET'])
+def survey():
+    with open('survey.json') as json_data:
+        d = json.load(json_data)
+        return jsonify(d)
+
+
+@app.route('/client_survey/<dataset>/<participant_id>', methods=['PUT'])
+def client_survey(dataset, participant_id):
+    doc = request.get_json(silent=True)
+    
+    with open(os.path.join(data_location, dataset, participant_id, 'client_demographics.json'), 
+        'w') as outfile:
+        json.dump(doc, outfile)
+
+    result = jsonify({'success': True})
+    return result, ok_status, json_type
+
 app.run(debug=True)
