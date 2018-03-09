@@ -250,7 +250,7 @@ def survey():
 def client_survey(dataset, participant_id):
     doc = request.get_json(silent=True)
     
-    with open(os.path.join(data_location, dataset, participant_id, 'client_demographics.json'), 
+    with open(os.path.join(data_location, dataset, participant_id, 'client_survey.json'), 
         'w') as outfile:
         json.dump(doc, outfile)
 
