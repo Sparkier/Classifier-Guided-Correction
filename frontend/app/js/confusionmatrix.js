@@ -3,6 +3,14 @@ const d3 = require('d3');
 import * as browserStore from 'storejs';
 
 export default function confusionmatrix(dataset) {
+	window.addEventListener( "pageshow", function ( event ) {
+		var historyTraversal = event.persisted || ( typeof window.performance != "undefined" && window.performance.navigation.type === 2 );
+		if ( historyTraversal ) {
+			// Handle page restore.
+			window.location.reload();
+		}
+	});
+
 	const participant_id = browserStore.get('participant_id');
 	if(participant_id === undefined) {
         $.ajax({
@@ -132,7 +140,7 @@ export default function confusionmatrix(dataset) {
 
 			function get_ssim() {
 				// Load SSIM Results
-				d3.tsv('api/ssim_csv/' + dataset, function(error, data) {
+				d3.tsv('api/ssim_csv/' + dataset + '/' + participant_id, function(error, data) {
 					data.forEach(function(d) {
 						d.label = +d.label;
 						d.class = +d.class;
@@ -141,6 +149,7 @@ export default function confusionmatrix(dataset) {
 						ssim_buckets[d.label * num_classes + d.class].max_ssim = d.max_ssim;
 						ssim_buckets[d.label * num_classes + d.class].avg_ssim = d.avg_ssim;
 					});
+					console.log(ssim_buckets)
 					redraw();
 				});
 			}
@@ -242,7 +251,7 @@ export default function confusionmatrix(dataset) {
 							}
 
 							// Add SSIM Indicators where appropriate.
-							if (ssim_buckets[class_number * num_classes + label_number].max_ssim > 0.95) {
+							if (ssim_buckets[label_number * num_classes + class_number].max_ssim > 0.95) {
 								var dim = Math.min(total_chart_width, total_chart_height)
 								confusion_main.append('svg:image')
 									.attr('xlink:href', 'api/icon/duplicates.png')

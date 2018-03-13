@@ -205,6 +205,10 @@ export default function trainclass(dataset, label, classification) {
 					check_images(all_images, prev_images, allImgs, buckets, correct);
 				});
 
+			var comboBox = document.getElementById("comboBox")
+			comboBox.onchange = function(){
+				check_images(all_images, prev_images, allImgs, buckets, correct);
+			};
 
 			barSelection.append('text')
 				.attr('x', 5)

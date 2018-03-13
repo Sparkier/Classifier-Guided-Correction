@@ -12,7 +12,9 @@ export function load_images(dataset, images, num_images, correct) {
   // Create the Canvas Element
   var newCanvas = document.createElement("canvas");
   var myNode = document.getElementById('imContainer');
-  var mode = document.getElementById("comboBox").selectedIndex;
+  var comboBox = document.getElementById("comboBox")
+  var mode = comboBox.selectedIndex;
+  
 
   // Remove previous Canvas
   while (myNode.firstChild) {

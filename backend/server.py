@@ -4,12 +4,12 @@ import os
 import re_tsne as rt
 import uuid
 from flask import jsonify
-from shutil import copyfile
+from shutil import copyfile, move
 import json
 
 app = Flask(__name__)
-data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
-#data_location = '/Users/alex/Documents/Studium/NeuralNetworks/'
+#data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
+data_location = '/Users/alex/Documents/Studium/NeuralNetworks/'
 ok_status = 200
 json_type = {'ContentType': 'application/json'}
 
@@ -76,11 +76,12 @@ def train_csv(dataset, participant_id):
                      as_attachment=True)
 
 
-@app.route('/ssim_csv/<dataset>')
-def ssim_csv(dataset):
-    return send_file(data_location + dataset + '/ssim/ssim.csv',
+@app.route('/ssim_csv/<dataset>/<participant_id>')
+def ssim_csv(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    return send_file(os.path.join(new_loc, 'ssim.csv'),
                      mimetype='text/csv',
-                     attachment_filename='train_images.csv',
+                     attachment_filename='ssim.csv',
                      as_attachment=True)
 
 
@@ -193,8 +194,21 @@ def modify_delete(dataset, lbl, classification, participant_id):
                                   probabilities, confirmed, tsne_saliency])
         # else:
             # remove(dataset, name)
-            
         image_number = image_number + 1
+
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    readCSV = csv.reader(open(os.path.join(new_loc, 'ssim.csv')), delimiter='\t')
+    writeCSV = csv.writer(open(os.path.join(new_loc, 'ssim2.csv'), 'w'), delimiter='\t')
+    writeCSV.writerow(next(readCSV))
+    for row in readCSV:
+        if(int(row[0]) == int(lbl) and int(row[1]) == int(classification)):
+            row[2] = str(0.5)
+            row[3] = str(0.5)
+            writeCSV.writerow(row)
+        else:
+            writeCSV.writerow(row)
+    move(os.path.join(new_loc, 'ssim2.csv'), os.path.join(new_loc, 'ssim.csv'))
+            
     return ('', 204)
 
 
@@ -206,17 +220,16 @@ def gen_participant_id(dataset):
         os.makedirs(new_loc)
     copyfile(os.path.join(data_location, dataset, 'train_images.csv'), 
             os.path.join(new_loc, 'train_images.csv'))
-    
+    copyfile(os.path.join(data_location, dataset, 'ssim/ssim.csv'), 
+        os.path.join(new_loc, 'ssim.csv'))    
     return jsonify({'participant_id': new_participant_id})
 
 
 @app.route('/client_information/<dataset>/<participant_id>', methods=['PUT'])
 def client_info(dataset, participant_id):
     doc = request.get_json(silent=True)
-    
     with open(os.path.join(data_location, dataset, participant_id, 'client_info.json'), 'w') as outfile:
         json.dump(doc, outfile)
-
     result = jsonify({'success': True})
     return result, ok_status, json_type
 
