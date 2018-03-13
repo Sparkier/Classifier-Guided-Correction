@@ -8,8 +8,8 @@ from shutil import copyfile
 import json
 
 app = Flask(__name__)
-#data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
-data_location = '/Users/alex/Documents/Studium/NeuralNetworks/'
+data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
+#data_location = '/Users/alex/Documents/Studium/NeuralNetworks/'
 ok_status = 200
 json_type = {'ContentType': 'application/json'}
 
