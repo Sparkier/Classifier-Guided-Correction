@@ -71,6 +71,36 @@
                 "Chemistry / Biology",
                 "other"
             ]
+        },
+        {
+            "type": "rating",
+            "name": "experience",
+            "isRequired": true,
+            "title": "How familiar are you with neural networks?",
+            "minRateDescription": "Not at all",
+            "maxRateDescription": "Use them regularily"
+        },
+        {
+            "type": "dropdown",
+            "name": "location",
+            "title": "Where are you located?",
+            "isRequired": true,
+            "colCount": 0,
+            "choices": [
+                "Eastern Europe",
+                "Northern Europe",
+                "Southern Europe",
+                "Western Europe",
+                "Canada",
+                "United States (Northeast)",
+                "United States (Midwest)",
+                "United States (South)",
+                "United States (West)",
+                "Middle East",
+                "Asia/Pacific",
+                "Latin America",
+                "Africa"
+            ]
         }
     ]}
 ],

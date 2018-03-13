@@ -134,7 +134,7 @@ export function update_data(probabilities, paths) {
 	detail_main.selectAll('rect')
 		.data(probs.slice(0, -1))
 		.attr('width', function(d) {
-			return x_scale_trainclass(d);
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
 		}) 
 		.enter()
 		.append('rect')
@@ -143,7 +143,7 @@ export function update_data(probabilities, paths) {
 			return (class_size.height * i) + (bar_padding * i);
 		})
 		.attr('width', function(d) {
-			return x_scale_trainclass(d);
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
 		}) 
 		.attr('height', class_size.height)
 		.attr('fill', 'hsl(238, 100%, 80%)')
@@ -191,15 +191,17 @@ export function update_data(probabilities, paths) {
 	detail_main.selectAll('.rect_invis')
 		.data(probs)
 		.on('click', function(d, i) {
-          	if (i == labels.length-1) {
-          		if (confirm("Remove these images from the Dataset?") == true) {
-     				remove(paths);
-    			}
-          	} else {
-          		if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
-     				relabel(paths, i);
-    			}
-          	}
+			if(paths.length > 0) {
+				if (i == labels.length-1) {
+					if (confirm("Remove these images from the Dataset?") == true) {
+					   remove(paths);
+				  }
+				} else {
+					if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
+					   relabel(paths, i);
+				  }
+				}
+			}
         })
 		.enter()
 		.append('rect')
@@ -211,17 +213,6 @@ export function update_data(probabilities, paths) {
 		.attr('width', x_scale_trainclass(1.0)) 
 		.attr('height', class_size.height)
 		.attr('fill', 'transparent')
-		.on('click', function(d, i) {
-          	if (i == labels.length-1) {
-          		if (confirm("Remove these images from the Dataset?") == true) {
-     				remove(paths);
-    			}
-          	} else {
-          		if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
-     				relabel(paths, i);
-    			}
-          	}
-        })
 		.exit()
 		.remove();
 	/***********************************************************

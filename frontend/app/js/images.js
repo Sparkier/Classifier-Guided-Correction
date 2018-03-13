@@ -70,7 +70,7 @@ export function load_images(dataset, images, num_images, correct) {
   }
 
   // Init the Detail View with no Data
-  update_data([], []);
+  update_data(selected_probs, selected_paths);
 }
 
 export function load_images_SSIM(dataset, ssim, all_images) {
