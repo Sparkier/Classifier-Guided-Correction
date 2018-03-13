@@ -236,7 +236,7 @@ export default function confusionmatrix(dataset) {
 									.attr('y', area_scale_y(parseFloat(k)/10.0) +
 										(i * (total_chart_height + chart_padding.vertical) + 
 										(chart_padding.vertical / 2)))
-									.attr('width', x_scale_trainclass(buck.num_images[k]))
+									.attr('width', x_scale_trainclass(buck.num_images[k]) > 0 ? x_scale_trainclass(buck.num_images[k]) : 0)
 									.attr('height', rect_height)
 									.attr('fill', '#A32638');
 							}
@@ -304,18 +304,6 @@ export default function confusionmatrix(dataset) {
 						.style('fill', 'hsl(238, ' + 0 + '%, ' + 60 + '%)')
 						.attr('opacity', '0.5');
 
-					// Add Histogram Bars
-					for (var k = parseInt((start_prob * 10)); k < 11; k++) {
-						svg_confusion.append('rect')
-							// Calcualte the Position of the Rect
-							.attr('x', 0)
-							.attr('y', area_scale_y(parseFloat(k)/10.0) + (i * (total_chart_height + 
-								chart_padding.vertical) + (chart_padding.vertical / 2)) + margin.top)
-							.attr('width', x_scale_trainclass(buck.num_images[k]))
-							.attr('height', rect_height)
-							.attr('fill', '#24740B');
-					}
-
 					// Add SSIM Indicator if neccessary.
 					if (ssim_buckets[i * num_classes + i].max_ssim > 0.95) {
 						var dim = Math.min(total_chart_width, total_chart_height)
@@ -351,6 +339,15 @@ export default function confusionmatrix(dataset) {
 						.style("text-anchor", "middle")
 						.attr('transform', 'translate('+ (margin.left/2) +','+ ((i + 1) * (total_chart_height + 
 							chart_padding.vertical) - chart_padding.vertical + margin.top) +')');
+
+					// Vertical Separation Lines
+					svg_confusion.append("line")
+						.attr("x1", margin.left)
+						.attr("x2", main_dims.main_width + margin.left)
+						.attr("y1", margin.top + (i * (chart_padding.vertical + total_chart_height)))
+						.attr("y2", margin.top + (i * (chart_padding.vertical + total_chart_height)))
+						.attr("stroke-width", 2)
+						.attr("stroke", "black");
 				}
 				
 				// Visual sparation of Text and Diagram

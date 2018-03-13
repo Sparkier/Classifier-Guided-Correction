@@ -6,6 +6,10 @@ export default function survey_final(dataset) {
     survey.defaultBootstrapCss.navigationButton = "btn btn-primary";
     survey.Survey.cssType = "bootstrap";
     const participant_id = browserStore.get('participant_id');
+    window.history.pushState(null, "", window.location.href);        
+    window.onpopstate = function() {
+        window.history.pushState(null, "", window.location.href);
+    };
 
     if(participant_id === undefined) {
         $.ajax({
