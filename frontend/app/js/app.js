@@ -9,9 +9,10 @@ import 'clientjs';
 
 $(() => {
     const client = new ClientJS();
-    var dataset = 'cifar10_test';
+    var dataset = 'mnist_mod';
     var location = window.location.href.toString().split(window.location.host)[1];
     const participant_id = browserStore.get('participant_id');
+    var timer = false;
 
     if(participant_id === undefined) {
         $.ajax({
@@ -47,9 +48,12 @@ $(() => {
         if (location == '/demographics.html') {
             demographics(dataset);
         } else if (location == '/confusion.html') {
-            setTimeout(function () {
-                window.location.href = "survey.html";
-            }, 900000);
+            if(!timer) {
+                timer = true;
+                setTimeout(function () {
+                    window.location.href = "survey.html";
+                }, 900000);
+            }
             confusionmatrix(dataset);
         } else if (location == '/survey.html') {
             survey_final(dataset);
