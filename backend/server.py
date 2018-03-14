@@ -69,6 +69,7 @@ def re_tsne(jsdata, lbl, classification, dataset):
 
 @app.route('/train_csv/<dataset>/<participant_id>')
 def train_csv(dataset, participant_id):
+    print('train')
     new_loc = os.path.join(data_location, dataset, participant_id)
     return send_file(os.path.join(new_loc, 'train_images.csv'),
                      mimetype='text/csv',
@@ -79,6 +80,7 @@ def train_csv(dataset, participant_id):
 @app.route('/ssim_csv/<dataset>/<participant_id>')
 def ssim_csv(dataset, participant_id):
     new_loc = os.path.join(data_location, dataset, participant_id)
+    print('send')
     return send_file(os.path.join(new_loc, 'ssim.csv'),
                      mimetype='text/csv',
                      attachment_filename='ssim.csv',
@@ -198,17 +200,20 @@ def modify_delete(dataset, lbl, classification, participant_id):
 
     new_loc = os.path.join(data_location, dataset, participant_id)
     readCSV = csv.reader(open(os.path.join(new_loc, 'ssim.csv')), delimiter='\t')
-    writeCSV = csv.writer(open(os.path.join(new_loc, 'ssim2.csv'), 'w'), delimiter='\t')
-    writeCSV.writerow(next(readCSV))
+    to_write = []
+    to_write.append(next(readCSV))
     for row in readCSV:
         if(int(row[0]) == int(lbl) and int(row[1]) == int(classification)):
             row[2] = str(0.5)
             row[3] = str(0.5)
-            writeCSV.writerow(row)
+            to_write.append(row)
         else:
-            writeCSV.writerow(row)
-    move(os.path.join(new_loc, 'ssim2.csv'), os.path.join(new_loc, 'ssim.csv'))
-            
+            to_write.append(row)
+
+    writeCSV = csv.writer(open(os.path.join(new_loc, 'ssim.csv'), 'w'), delimiter='\t')
+    for r in to_write:
+        writeCSV.writerow(r)
+    
     return ('', 204)
 
 

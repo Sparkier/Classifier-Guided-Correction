@@ -88,7 +88,7 @@ export default function confusionmatrix(dataset) {
 			}
 
 			// Load the Image Classification Results.
-			d3.tsv('api/train_csv/' + dataset + '/' + participant_id, function(error, data) {
+			d3.tsv('api/train_csv/' + dataset + '/' + participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 				// Convert all images and sort them into Buckets 
 				data.forEach(function(d) {
 					d.confirmed = +d.confirmed;
@@ -140,7 +140,8 @@ export default function confusionmatrix(dataset) {
 
 			function get_ssim() {
 				// Load SSIM Results
-				d3.tsv('api/ssim_csv/' + dataset + '/' + participant_id, function(error, data) {
+				d3.tsv('api/ssim_csv/' + dataset + '/' + participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
+					console.log(data)
 					data.forEach(function(d) {
 						d.label = +d.label;
 						d.class = +d.class;
