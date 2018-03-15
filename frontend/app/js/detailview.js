@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import * as browserStore from 'storejs';
 
 const d3 = require('d3');
 var probs = [];
@@ -14,11 +15,22 @@ var labels;
 var dataloc;
 var lbl;
 var cls;
+var participant_id;
 
 export default function detailview(dataset, label, classification) {
 	dataloc = dataset;
 	lbl = label;
 	cls = classification;
+
+	participant_id = browserStore.get('participant_id');
+	if(participant_id === undefined) {
+        $.ajax({
+            method: 'GET',
+            url: '/api/participant_id/' + dataset
+        }).done((data) => {
+            browserStore.set('participant_id', data.participant_id);
+        });
+    }
 
 	// Get the Classes from the text File that was used for training the labels
 	d3.text('api/labels_txt/' + dataset, function(error, retrained_labels) {
@@ -122,7 +134,7 @@ export function update_data(probabilities, paths) {
 	detail_main.selectAll('rect')
 		.data(probs.slice(0, -1))
 		.attr('width', function(d) {
-			return x_scale_trainclass(d);
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
 		}) 
 		.enter()
 		.append('rect')
@@ -131,7 +143,7 @@ export function update_data(probabilities, paths) {
 			return (class_size.height * i) + (bar_padding * i);
 		})
 		.attr('width', function(d) {
-			return x_scale_trainclass(d);
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
 		}) 
 		.attr('height', class_size.height)
 		.attr('fill', 'hsl(238, 100%, 80%)')
@@ -179,15 +191,17 @@ export function update_data(probabilities, paths) {
 	detail_main.selectAll('.rect_invis')
 		.data(probs)
 		.on('click', function(d, i) {
-          	if (i == labels.length-1) {
-          		if (confirm("Remove these images from the Dataset?") == true) {
-     				remove(paths);
-    			}
-          	} else {
-          		if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
-     				relabel(paths, i);
-    			}
-          	}
+			if(paths.length > 0) {
+				if (i == labels.length-1) {
+					if (confirm("Remove these images from the Dataset?") == true) {
+					   remove(paths);
+				  }
+				} else {
+					if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
+					   relabel(paths, i);
+				  }
+				}
+			}
         })
 		.enter()
 		.append('rect')
@@ -199,17 +213,6 @@ export function update_data(probabilities, paths) {
 		.attr('width', x_scale_trainclass(1.0)) 
 		.attr('height', class_size.height)
 		.attr('fill', 'transparent')
-		.on('click', function(d, i) {
-          	if (i == labels.length-1) {
-          		if (confirm("Remove these images from the Dataset?") == true) {
-     				remove(paths);
-    			}
-          	} else {
-          		if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
-     				relabel(paths, i);
-    			}
-          	}
-        })
 		.exit()
 		.remove();
 	/***********************************************************
@@ -219,7 +222,7 @@ export function update_data(probabilities, paths) {
 
 function relabel(paths, new_label) {
 	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc, function(error, data) {
+	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id, function(error, data) {
 		/***********************************************************
 		  Start: Convert all images
 		***********************************************************/
@@ -245,7 +248,7 @@ function relabel(paths, new_label) {
 
 		var json = JSON.stringify(images);
 		var xhttp = new XMLHttpRequest();
-  		xhttp.open("POST", "api/modify_csv/" + dataloc + '/' + lbl + '/' + cls);
+  		xhttp.open("POST", "api/modify_csv/" + dataloc + '/' + lbl + '/' + cls + '/' + participant_id);
   		xhttp.setRequestHeader("Content-Type", "application/json");
   		xhttp.onreadystatechange = function() {//Call a function when the state changes.
     		if(xhttp.readyState == 4 && xhttp.status == 204) {
@@ -261,7 +264,7 @@ function relabel(paths, new_label) {
 
 function remove(paths) {
 	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc, function(error, data) {
+	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id, function(error, data) {
 		/***********************************************************
 		  Start: Convert all images
 		***********************************************************/
@@ -285,7 +288,7 @@ function remove(paths) {
 
 		var json = JSON.stringify(images);
 		var xhttp = new XMLHttpRequest();
-  		xhttp.open("POST", "api/modify_delete/" + dataloc + '/' + lbl + '/' + cls);
+  		xhttp.open("POST", "api/modify_delete/" + dataloc + '/' + lbl + '/' + cls + '/' + participant_id);
   		xhttp.setRequestHeader("Content-Type", "application/json");
   		xhttp.onreadystatechange = function() {//Call a function when the state changes.
     		if(xhttp.readyState == 4 && xhttp.status == 204) {

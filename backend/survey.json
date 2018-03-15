@@ -1,0 +1,66 @@
+{ "title": "Survey Questions", "showProgressBar": "top", "pages": [
+    {"questions": [
+        {
+            "type": "rating",
+            "name": "help",
+            "isRequired": true,
+            "title": "Were the visualizations a big help in spotting errors?",
+            "minRateDescription": "No, they disturbed me",
+            "maxRateDescription": "Yes, they helped a lot"
+        },
+        {
+            "type": "text",
+            "name": "mosthelp",
+            "title": "What was most supportive about the visualization?",
+            "isRequired": true
+        },
+        {
+            "type": "text",
+            "name": "leasthelp",
+            "title": "What was least supportive about the visualization?",
+            "isRequired": true
+        }
+    ]},
+    {"questions": [
+        {
+            "type": "rating",
+            "name": "satisfaction",
+            "isRequired": true,
+            "title": "How satisfied were you with using the visualizations?",
+            "minRateDescription": "Not at all",
+            "maxRateDescription": "Very satisfied"
+        },
+        {
+            "type": "text",
+            "name": "mostsatisfaction",
+            "title": "What about the visualizations made you satisfied?",
+            "isRequired": true
+        },
+        {
+            "type": "text",
+            "name": "leastsatisfaction",
+            "title": "What about the visualizations made you mad?",
+            "isRequired": true
+        }
+    ]},
+    {"questions": [
+        {
+            "type": "text",
+            "name": "best",
+            "title": "What about the visualizations do you think is really well designed?",
+            "isRequired": true
+        },
+        {
+            "type": "text",
+            "name": "improve",
+            "title": "What about the visualizations do you think could be improved?",
+            "isRequired": true
+        },
+        {
+            "type": "text",
+            "name": "limitations",
+            "title": "What limitations do you see in this approach?",
+            "isRequired": true
+        }
+    ]}
+]}

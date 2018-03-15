@@ -12,7 +12,9 @@ export function load_images(dataset, images, num_images, correct) {
   // Create the Canvas Element
   var newCanvas = document.createElement("canvas");
   var myNode = document.getElementById('imContainer');
-  var mode = document.getElementById("comboBox").selectedIndex;
+  var comboBox = document.getElementById("comboBox")
+  var mode = comboBox.selectedIndex;
+  
 
   // Remove previous Canvas
   while (myNode.firstChild) {
@@ -70,7 +72,7 @@ export function load_images(dataset, images, num_images, correct) {
   }
 
   // Init the Detail View with no Data
-  update_data([], []);
+  update_data(selected_probs, selected_paths);
 }
 
 export function load_images_SSIM(dataset, ssim, all_images) {
@@ -155,6 +157,7 @@ export function append(dataset, image, number, num_per_line) {
     oImg.on('selected', function() {
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
+      console.log(image.name)
       update_data(selected_probs, selected_paths);
     });
     oImg.on('deselected', function() {

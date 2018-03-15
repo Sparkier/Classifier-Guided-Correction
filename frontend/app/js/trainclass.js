@@ -5,8 +5,19 @@ import {
 } from './images'
 import $ from 'jquery';
 const d3 = require('d3');
+import * as browserStore from 'storejs';
 
 export default function trainclass(dataset, label, classification) {
+	var participant_id = browserStore.get('participant_id');
+	if(participant_id === undefined) {
+        $.ajax({
+            method: 'GET',
+            url: '/api/participant_id/' + dataset
+        }).done((data) => {
+            browserStore.set('participant_id', data.participant_id);
+        });
+	}
+	
 	// Get the Classes from the text File that was used for training the labels
 	d3.text('api/labels_txt/' + dataset, function(error, retrained_labels) {
 		var correct = false;
@@ -35,7 +46,7 @@ export default function trainclass(dataset, label, classification) {
 			left: 70
 		};
 
-		var myNode = document.getElementById('imContainer');
+		var myNode = document.getElementById('rightSection');
 		var width = myNode.clientWidth;
 		var rect_size = {
 			width: 12,
@@ -62,7 +73,7 @@ export default function trainclass(dataset, label, classification) {
 		***********************************************************/
 		var svg_trainclass = d3.select('#trainclassContainer')
 			.append('svg')
-			.attr('width', totalWidth)
+			.attr('width', width)
 			.attr('height', totalHeight);
 
 		// Main Group for this SVG
@@ -73,7 +84,7 @@ export default function trainclass(dataset, label, classification) {
 		***********************************************************/
 
 		// Load the Image Classification Results
-		d3.tsv('api/train_csv/' + dataset, function(error, data) {
+		d3.tsv('api/train_csv/' + dataset + '/' + participant_id, function(error, data) {
 			// Convert all Items  
 			data.forEach(function(d) {
 				// image,label,class,percentage
@@ -194,6 +205,10 @@ export default function trainclass(dataset, label, classification) {
 					check_images(all_images, prev_images, allImgs, buckets, correct);
 				});
 
+			var comboBox = document.getElementById("comboBox")
+			comboBox.onchange = function(){
+				check_images(all_images, prev_images, allImgs, buckets, correct);
+			};
 
 			barSelection.append('text')
 				.attr('x', 5)
@@ -205,6 +220,7 @@ export default function trainclass(dataset, label, classification) {
 					return d.num_images;
 				})
 				.style("font-size", "12px")
+				.style("fill", "white")				
 				.style("pointer-events", "none");
 			/***********************************************************
 				End: Add a Rect and Text for each Bucket
