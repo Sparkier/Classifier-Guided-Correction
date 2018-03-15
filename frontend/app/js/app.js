@@ -57,6 +57,8 @@ $(() => {
             confusionmatrix(dataset);
         } else if (location == '/survey.html') {
             survey_final(dataset);
+        } else if (location == '/video.html'){
+
         } else {
             var label = findGetParameter('label');
             var classification = findGetParameter('class');

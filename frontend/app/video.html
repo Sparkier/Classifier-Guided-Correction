@@ -1,0 +1,47 @@
+<html>
+<head>
+<script src="http://www.youtube.com/player_api"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+</head>
+<body>
+    <div id="youtubevideo"></div>
+    <script>
+        // create player
+        var youtubevideo;
+        function onYouTubePlayerAPIReady() {
+            youtubevideo = new YT.Player('youtubevideo', {
+            height: $(window).height() - 100,
+            width: $(window).width() - 100,
+            videoId: '8EBNHCAyXOg',
+
+
+        //Here the video autoplays, the player hide controls and disable keyboard to prevent users from running past the video. NB: Autoplay only works on PCs. iOS 8 also forces Native controls.
+
+            playerVars:{'rel':0,'showinfo':0,'autoplay':1,'controls':0,'disablekb':1,'modestbranding':1},
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+            });
+        }
+
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+
+        //This tells the youtube player to trigger the hello() function when done
+        function onPlayerStateChange(event) {        
+            if(event.data === 0) {            
+                redirect();
+            }
+        }
+
+        //THe hello function uses ajax to bring up html after the video ends. It is achieved using jquery DOM manupulation
+
+        function redirect(){
+            window.location.href = "confusion.html";
+        }
+    </script>
+</body
+</html>
