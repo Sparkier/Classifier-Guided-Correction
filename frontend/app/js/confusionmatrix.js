@@ -368,7 +368,7 @@ export default function confusionmatrix(dataset) {
 					.attr("y1", 0)
 					.attr("y2", main_dims.main_height + margin.top)
 					.attr("stroke-width", 2)
-					.attr("stroke", "black");
+					.attr("stroke", "lightgrey");
 				// Horizontal Separation Line
 				svg_confusion.append("line")
 					.attr("x1", 0)
