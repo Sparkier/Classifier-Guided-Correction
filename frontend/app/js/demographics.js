@@ -42,7 +42,7 @@ export default function demographics(dataset) {
             contentType: 'application/json'
         }).done(() => {
             setTimeout(function () {
-                window.location.href = "confusion.html";
+                window.location.href = "video.html";
             }, 10000);
         });
     }
