@@ -50,9 +50,9 @@ $(() => {
         } else if (location == '/confusion.html') {
             if(!timer) {
                 timer = true;
-                /*setTimeout(function () {
+                setTimeout(function () {
                     window.location.href = "survey.html";
-                }, 900000);*/
+                }, 900000);
             }
             confusionmatrix(dataset);
         } else if (location == '/survey.html') {

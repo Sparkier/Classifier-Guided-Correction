@@ -174,7 +174,6 @@ function append(dataset, image, number, num_per_line) {
     oImg.on('selected', function() {
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
-      console.log(image.name)
       update_data(selected_probs, selected_paths);
     });
     oImg.on('deselected', function() {
@@ -205,7 +204,6 @@ function appendQuadratic(dataset, image, number, start_x, start_y, num_per_line)
     oImg.on('selected', function() {
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
-      console.log(image.name)
       update_data(selected_probs, selected_paths);
     });
     oImg.on('deselected', function() {
@@ -237,7 +235,6 @@ function appendTSNE(dataset, image, dims, width, height) {
     oImg.scaleToWidth(28);
     oImg.scaleToHeight(28);
     oImg.on('selected', function() {
-      console.log(image.name);
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
       update_data(selected_probs, selected_paths);
@@ -269,7 +266,6 @@ function appendSSIM(dataset, image, n_pair, n_image) {
     oImg.scaleToWidth(28);
     oImg.scaleToHeight(28);
     oImg.on('selected', function() {
-      console.log(image.name);
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
       update_data(selected_probs, selected_paths);

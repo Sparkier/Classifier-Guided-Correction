@@ -76,12 +76,6 @@ h2 {
   background-color: lightgrey;
 }
 
-.controlsContainer {
-  background-color: grey;
-  width: 100%;
-  position: absolute;
-}
-
 .ssimContainer {
   height: 100px;
   width: 100%;
@@ -90,42 +84,27 @@ h2 {
   background-color: lightgrey;
 }
 
-/* Selection style for selecting Image Groups */
-rect.selected {
-  stroke: black;
-}
-rect.correctly {
-  fill: #A32638;
-}
-rect.falsely {
-  fill: #24740B;
+.controlsContainer {
+  background-color: grey;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #element1 {
-  display:inline-block; 
-  margin-left:10px;
-  width:40%; 
-  margin-top: 5px; 
+  width: 30%;
+  margin-left: 10px;
 } 
 
 #element2 {
-  display:inline-block;  
-  width: 25%;
-}
-
-#span {
-  margin: auto;
-  position: absolute;
-  top: 35%; left: 55%; bottom: 0; right: 0;
+  width: 80px;
 }
 
 #element3 {
-  display:inline-block; 
-  float: right; 
-  margin-right: 10px; 
-  margin-top: 10px; 
+  margin-top: 10px;
   margin-bottom: 10px;
-  width: 30%;
+  margin-right: 10px;
 }
 
 select {
@@ -160,4 +139,62 @@ select {
     5px 5px,
     2.5em 2.5em;
   background-repeat: no-repeat;
+}
+
+
+#popup {
+  width:100%;
+  height:100%;
+  top:0;
+  left:0;
+  display:none;
+  position:fixed;
+  background-color:rgba($color: black, $alpha: 0.3);
+}
+
+div#popupNone {
+  position:absolute;
+  left:50%;
+  top:50%;
+  margin-left:-150px;
+  margin-top:-120px;
+}
+
+#formNone {
+  width: 300px;
+  height: 130px;
+  background-color:#fff
+}
+
+#submit {
+  text-decoration:none;
+  width:50%;
+  text-align:center;
+  display:block;
+  background-color:grey;
+  color:#fff;
+  padding:10px 0;
+  font-size:20px;
+  cursor:pointer;
+}
+
+#cancel {
+  text-decoration:none;
+  width:50%;
+  text-align:center;
+  display:block;
+  background-color:grey;
+  color:#fff;
+  padding:10px 0;
+  font-size:20px;
+  cursor:pointer;
+}
+
+#labelBox {
+  width: 90%;
+  margin-right: 5%;
+}
+
+#buttons {
+  display: flex;
 }

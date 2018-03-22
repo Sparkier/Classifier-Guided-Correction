@@ -5,7 +5,7 @@ const d3 = require('d3');
 var x_scale_trainclass;
 var detail_main;
 var button_size = {
-	width: 480,
+	width: 460,
 	height: 30
 };
 var width = 0;
@@ -13,18 +13,24 @@ var total_width = 0;
 var height = 0;
 var total_height = 0;
 var bar_padding = 5;
+var chart_padding = 40;
 var labels;
 var dataloc;
 var lbl;
 var cls;
+var total_chart_height;
 var participant_id;
-/*
+var margin = {
+	top: 10,
+	right: 20,
+	bottom: 10,
+	left: 20
+};
 var probs = [];
 var class_size = {
-	width: 12,
-	height: 20
+	width: 460,
+	height: 12
 };
-*/
 
 export default function detailview(dataset, label, classification) {
 	// Standart Setup
@@ -57,28 +63,18 @@ export default function detailview(dataset, label, classification) {
 		}
 		labels = retrained_labels;
 
-		/*
 		for (var i = 0; i < num_classes; i++) {
 			probs.push(0.0);
 		}
-		*/
 		
 		// Initialization Variables
-	    var margin = {
-			top: 10,
-			right: 10,
-			bottom: 30,
-			left: 10
-		};
-
-		/*
 		var start_prob = 1.0 / num_classes;
 		var prob_step_size = 0.1;
-		var total_chart_height = (num_classes * class_size.height) + (bar_padding * num_classes);
-		*/
+		total_chart_height = (num_classes * class_size.height);
+
 		height = 4 * (button_size.height + bar_padding);
 		width = total_width - margin.left - margin.right;
-		total_height = height + margin.top + margin.bottom;
+		total_height = Math.max(height + margin.top + margin.bottom + total_chart_height + chart_padding, myNode.clientHeight - 10);
 
 		// Main SVG
 		var svg_detail = d3.select('#detailContainer')
@@ -98,6 +94,11 @@ export function update_data(probabilities, paths) {
 	// Update the Selected Number of Items
 	var myNode = document.getElementById('span');
 	myNode.innerHTML = paths.length + ' Selected';
+	if(paths.length > 0) {
+		document.getElementById('detailImage').src = 'api/image/' + dataloc + '/' + paths[0];	
+	} else {
+		document.getElementById('detailImage').src = 'api/icon/placeholder.jpg';
+	}
 
 	// Add the four Buttons
 	var texts = [];
@@ -107,7 +108,7 @@ export function update_data(probabilities, paths) {
 			'Human Correct',
 			'Computer Correct',
 			'None',
-			'Delete Item'
+			'Delete Items'
 		];
 		desc = [
 			'Class: ' + lbl,
@@ -121,17 +122,19 @@ export function update_data(probabilities, paths) {
 			.append('rect')
 			.attr('x', 0)
 			.attr('y', function(d, i) {
-				return (button_size.height * i) + (bar_padding * i);
+				if(i == 3) {
+					return total_height - margin.bottom - button_size.height - 10;
+				} else {
+					return (button_size.height * i) + (bar_padding * i);
+				}
 			})
 			.attr('height', button_size.height)
 			.attr('width', button_size.width)
 			.attr('fill', function(d, i) {
-				if(i == 3) {
-					return '#A32638'
-				} else {
-					return 'lightgrey'
-				}
+				return 'lightgrey'
 			})
+			.attr('stroke-width', '1')
+			.attr('stroke', 'black')
 			.attr('class', 'buttonrect');
 
 		// Text for Class Label and Probability Value
@@ -143,7 +146,11 @@ export function update_data(probabilities, paths) {
 				return texts[i];
 			})
 			.attr('transform', function(d, i) {
-				return 'translate('+ 5 +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
+				if(i == 3) {
+					return 'translate('+ 5 +','+ (total_height - margin.bottom - 18) +')';
+				} else {
+					return 'translate('+ 5 +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
+				}
 			})
 			.attr('class', 'buttontext');
 
@@ -177,8 +184,26 @@ export function update_data(probabilities, paths) {
 						relabel(paths, cls);
 					}
 				} else if (i == 2) {
-					if (confirm("Label these images as "+cls+"?") == true) {
-						relabel(paths, cls);
+					var popup = document.getElementById('popup');
+					var select = document.getElementById('labelBox');
+					var cancel = document.getElementById('cancel');
+					var confirmbtn = document.getElementById('submit');
+
+					for(var item in labels) {
+						var opt = document.createElement('option');
+            			opt.value = labels[item];
+            			opt.innerHTML = labels[item];
+            			select.appendChild(opt);
+					}
+					
+					popup.style.display = "block";
+					cancel.onclick = function() {
+						popup.style.display = "none";
+					}
+					confirmbtn.onclick = function() {
+						var value = select.value;
+						relabel(paths, value)
+						popup.style.display = "none";
 					}
 				} else if (i == 3) {
 					if (confirm("Delete these Images?") == true) {
@@ -189,7 +214,11 @@ export function update_data(probabilities, paths) {
 			.attr("class", "buttoninvis")
 			.attr('x', 0)
 			.attr('y', function(d, i) {
-				return (button_size.height * i) + (bar_padding * i);
+				if(i == 3) {
+					return total_height - margin.bottom - button_size.height - 10;
+				} else {
+					return (button_size.height * i) + (bar_padding * i);
+				}
 			})
 			.attr('height', button_size.height)
 			.attr('width', button_size.width)
@@ -199,115 +228,65 @@ export function update_data(probabilities, paths) {
 		detail_main.selectAll('.buttontext').remove();
 		detail_main.selectAll('.desctext').remove();
 		detail_main.selectAll('.buttoninvis').remove();
+		detail_main.selectAll(".axis").remove();
 	}
 
-	
-
     // Fill the probability array
-	/*for (var i = 0; i < probs.length-1; i++) {
+	for (var i = 0; i < probs.length; i++) {
 		probs[i] = 0.0;
 	}
 	for (var i = 0; i < probabilities.length; i++) {
-		for (var j = 0; j <  probs.length-1; j++) {
+		for (var j = 0; j <  probs.length; j++) {
 			probs[j] = probs[j] + probabilities[i][j];
 		}
 	}
-	for (var j = 0; j <  probs.length-1; j++) {
+	for (var j = 0; j <  probs.length; j++) {
 		probs[j] = probs[j] / probabilities.length;	
-	}*/
+	}
 	
-	// Add bars and text to DetailView
+	// Add bars to diagram
+	x_scale_trainclass = d3.scaleLinear().domain([0.0, 1.0]).range([0.0, class_size.width - 40]);
+	var y_tick_strings = [];
+	for (var i = 0; i < labels.length; i++) {
+		y_tick_strings.push(labels[i]);
+	}
+	var y_scale_trainclass = d3.scaleBand().domain(y_tick_strings).range([total_chart_height, 0]);
+	var y_shift = (3 * (button_size.height + bar_padding)) + 10;
+	var axis = d3.axisLeft(y_scale_trainclass)
 	
-	// Scale for visible Bars
-	/*
-	x_scale_trainclass = d3.scaleLinear().domain([0.0, 1.0]).range([0.0, width]);
-
 	// Visible bars indicating class probabilities
-	detail_main.selectAll('rect')
-		.data(probs.slice(0, -1))
-		.attr('width', function(d) {
-			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
-		}) 
-		.enter()
-		.append('rect')
-		.attr('x', 0)
-		.attr('y', function(d, i) {
-			return (class_size.height * i) + (bar_padding * i);
-		})
-		.attr('width', function(d) {
-			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
-		}) 
-		.attr('height', class_size.height)
-		.attr('fill', 'hsl(238, 100%, 80%)')
-		.exit()
-		.remove();
-
-	// Text for Class Label and Probability Value
-	detail_main.selectAll('text')
-		.data(labels)
-		.text(function(d, i) {
-			if (isNaN(probs[i])) {
-				return ('');
-			} else if (i == labels.length-1) {
-				if (isNaN(probs[0])) {
-					return '';
-				} else {
-					return ('Remove Items from Dataset');
-				}
-			} else {
-				return (d + ': ' + (probs[i].toFixed(2)) + '%');
-			}
-		})
-		.enter()
-		.append('text')
-		.text(function(d, i) {
-			if (isNaN(probs[i])) {
-				return ('');
-			} else if (i == labels.length-1) {
-				if (isNaN(probs[0])) {
-					return '';
-				} else {
-					return ('Remove Items from Dataset');
-				}
-			} else {
-				return (d + ': ' + (probs[i].toFixed(2)) + '%');
-			}
-		})
-		.attr('transform', function(d, i) {
-			return 'translate('+ 5 +','+ ((class_size.height * (i+1)) + (bar_padding * i) - 4) +')';
-		})
-		.exit()
-		.remove();
-
-	// Invisible Rect for handling Click Events
-	detail_main.selectAll('.rect_invis')
+	detail_main.selectAll('.rectdiag')
 		.data(probs)
-		.on('click', function(d, i) {
-			if(paths.length > 0) {
-				if (i == labels.length-1) {
-					if (confirm("Remove these images from the Dataset?") == true) {
-					   remove(paths);
-				  }
-				} else {
-					if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
-					   relabel(paths, i);
-				  }
-				}
-			}
-        })
+		.attr('width', function(d) {
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
+		}) 
 		.enter()
 		.append('rect')
-		.attr("class", "rect_invis")
-		.attr('x', 0)
+		.attr('x', 30)
 		.attr('y', function(d, i) {
-			return (class_size.height * i) + (bar_padding * i);
+			return (class_size.height * (labels.length - i - 1)) + y_shift;
 		})
-		.attr('width', x_scale_trainclass(1.0)) 
+		.attr('width', function(d) {
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
+		}) 
 		.attr('height', class_size.height)
-		.attr('fill', 'transparent')
+		.attr('fill', '#A32638')
+		.attr('class', 'rectdiag')
 		.exit()
 		.remove();
-	*/
+
+	if(paths.length > 0) {
+		// Y-Axis
+		detail_main.append('g')
+			.attr('transform', 'translate(' + 30 + ',' + y_shift + ')')
+			.attr('class', 'axis')
+			.call(d3.axisLeft(y_scale_trainclass));
+	
+		detail_main.append('g')
+			.attr('transform', 'translate(' + 30 + ',' + (y_shift + total_chart_height) + ')')
+			.attr('class', 'axis')
+			.call(d3.axisBottom(x_scale_trainclass));
+	}
 };
 
 function relabel(paths, new_label) {
@@ -316,7 +295,7 @@ function relabel(paths, new_label) {
 		/***********************************************************
 		  Start: Convert all images
 		***********************************************************/
-		images = [];
+		var images = [];
 		data.forEach(function(d) {
 			d.image = +d.image;
 			d.label = +d.label;
@@ -358,7 +337,7 @@ function remove(paths) {
 		/***********************************************************
 		  Start: Convert all images
 		***********************************************************/
-		images = [];
+		var images = [];
 		data.forEach(function(d) {
 			d.image = +d.image;
 			d.label = +d.label;
