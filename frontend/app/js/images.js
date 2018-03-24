@@ -15,40 +15,19 @@ export function load_images(dataset, images, num_images, correct) {
   var comboBox = document.getElementById("comboBox")
   var mode = comboBox.selectedIndex;
   
-
   // Remove previous Canvas
-  while (myNode.firstChild) {
-    myNode.removeChild(myNode.firstChild);
+  if(myNode.hasChildNodes()) {
+    myNode.removeChild(myNode.lastChild);
   }
   
   // Calculate Canvas Basics
-  var width = myNode.clientWidth;
-  var height = myNode.clientHeight;
-
-  // Change the Heading do match the number of Images displayed
-  //var heading = document.getElementById('imHeading');
+  var width = myNode.clientWidth - 15;
+  var height = myNode.clientHeight - 60;
   
   if (mode == 0 && images.length > 5 && !correct) {
-    var dims = Math.min(width, (height - 50));
+    var dims = Math.min(width, height);
 
     // t-SNE
-    // Add the Canvas and Configure it
-    myNode.appendChild(newCanvas);
-    canvas = new fabric.Canvas(newCanvas, {
-      width: dims,
-      height: dims
-    });
-    configureCanvas();
-
-    // Create a List of all Images
-    for (var i = 0; i < images.length; i++) {
-      appendTSNE(dataset, images[i], mode, dims);
-    }
-  } else {
-    // No t-SNE
-    var num_per_line = Math.floor(width / 32);
-    var num_lines = images.length / num_per_line + 1;
-    var height = num_lines * 32;
     // Add the Canvas and Configure it
     myNode.appendChild(newCanvas);
     canvas = new fabric.Canvas(newCanvas, {
@@ -56,6 +35,15 @@ export function load_images(dataset, images, num_images, correct) {
       height: height
     });
     configureCanvas();
+
+    // Create a List of all Images
+    for (var i = 0; i < images.length; i++) {
+      appendTSNE(dataset, images[i], dims, width, height);
+    }
+  } else {
+    // No t-SNE
+    var num_per_line = Math.floor(width / 32);
+    var num_lines = images.length / num_per_line + 1;
 
     // Sort the images
     images.sort(function(a, b) {
@@ -65,9 +53,38 @@ export function load_images(dataset, images, num_images, correct) {
       }
     });
 
-    // Create a List of all Images
-    for (var i = 0; i < images.length; i++) {
-      append(dataset, images[i], i, num_per_line);
+    if((num_lines * 32) > height) {
+      // Add the Canvas and Configure it
+      myNode.appendChild(newCanvas);
+      canvas = new fabric.Canvas(newCanvas, {
+        width: width,
+        height: num_lines * 32
+      });
+      configureCanvas();
+
+      // Create a List of all Images
+      for (var i = 0; i < images.length; i++) {
+        append(dataset, images[i], i, num_per_line);
+      }
+    } else{
+      // Add the Canvas and Configure it
+      myNode.appendChild(newCanvas);
+      canvas = new fabric.Canvas(newCanvas, {
+        width: width,
+        height: height
+      });
+      configureCanvas();
+      var num_per_line = Math.ceil(Math.sqrt(images.length));
+      var num_lines = images.length / num_per_line;
+      var imgs_width = num_per_line * 32;
+      var imgs_height = num_lines * 32;
+
+      var start_x = (width / 2) - (imgs_width / 2);
+      var start_y = (height / 2) - (imgs_height / 2);
+
+      for(var i = 0; i < images.length; i++) {
+        appendQuadratic(dataset, images[i], i, start_x, start_y, num_per_line);
+      }
     }
   }
 
@@ -87,7 +104,7 @@ export function load_images_SSIM(dataset, ssim, all_images) {
 
   // Calculate Canvas Basics
   var width = myNode.clientWidth;
-  var height = myNode.clientHeight;
+  var height = 40;
 
   // Add the Canvas and Configure it
   myNode.appendChild(newCanvas);
@@ -139,7 +156,7 @@ export function load_images_SSIM(dataset, ssim, all_images) {
 }
 
 // Appending all the images to the View
-export function append(dataset, image, number, num_per_line) {
+function append(dataset, image, number, num_per_line) {
   var line = Math.floor(number / num_per_line);
   var in_line = number % num_per_line;
   
@@ -157,7 +174,6 @@ export function append(dataset, image, number, num_per_line) {
     oImg.on('selected', function() {
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
-      console.log(image.name)
       update_data(selected_probs, selected_paths);
     });
     oImg.on('deselected', function() {
@@ -170,21 +186,13 @@ export function append(dataset, image, number, num_per_line) {
   });
 }
 
-export function appendTSNE(dataset, image, mode, width) {
-  var pos_X = 0.0;
-  var pos_Y = 0.0;
-  if (mode == 1) {
-      pos_X = image.tsne_unprocessed[0];
-      pos_Y = image.tsne_unprocessed[1];
-  } else {
-      pos_X = image.tsne_saliency[0];
-      pos_Y = image.tsne_saliency[1];
-  }
-  pos_X = ((pos_X + 1.0)  / 2.0) * (width-32);
-  pos_Y = ((pos_Y + 1.0)  / 2.0) * (width-32);
+function appendQuadratic(dataset, image, number, start_x, start_y, num_per_line) {
+  var line = Math.floor(number / num_per_line);
+  var in_line = number % num_per_line;
+
   var im = new fabric.Image.fromURL('api/image/' + dataset + '/' + image.name, function(oImg) { 
-    oImg.set({'left':pos_X,
-              'top':pos_Y});
+    oImg.set({'left':(start_x + 32*in_line),
+              'top':(start_y + 32*line)});
     if(!image.name.includes('train')) {
       oImg.set({
         'stroke': 'blue',
@@ -194,7 +202,6 @@ export function appendTSNE(dataset, image, mode, width) {
     oImg.scaleToWidth(28);
     oImg.scaleToHeight(28);
     oImg.on('selected', function() {
-      console.log(image.name);
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
       update_data(selected_probs, selected_paths);
@@ -209,14 +216,46 @@ export function appendTSNE(dataset, image, mode, width) {
   });
 }
 
-export function appendSSIM(dataset, image, n_pair, n_image) {
+function appendTSNE(dataset, image, dims, width, height) {
+  var pos_X = 0.0;
+  var pos_Y = 0.0;
+  pos_X = image.tsne_saliency[0];
+  pos_Y = image.tsne_saliency[1];
+  pos_X = ((pos_X + 1.0)  / 2.0) * (dims-32) + ((width-dims)/2);
+  pos_Y = ((pos_Y + 1.0)  / 2.0) * (dims-32) + ((height-dims)/2);
+  var im = new fabric.Image.fromURL('api/image/' + dataset + '/' + image.name, function(oImg) { 
+    oImg.set({'left':pos_X,
+              'top':pos_Y});
+    if(!image.name.includes('train')) {
+      oImg.set({
+        'stroke': 'blue',
+        'strokeWidth': 2
+      })
+    }
+    oImg.scaleToWidth(28);
+    oImg.scaleToHeight(28);
+    oImg.on('selected', function() {
+      selected_paths.push(image.name);
+      selected_probs.push(image.probabilities);
+      update_data(selected_probs, selected_paths);
+    });
+    oImg.on('deselected', function() {
+      var index = selected_paths.indexOf(image.name);
+      selected_paths.splice(index, 1);
+      selected_probs.splice(index, 1);
+      update_data(selected_probs, selected_paths);
+    });
+    canvas.add(oImg);
+  });
+}
+
+function appendSSIM(dataset, image, n_pair, n_image) {
   var pos_pair_x = n_pair * 80;
-  var pos_pair_y = 0;
 
   var im = new fabric.Image.fromURL('api/image/' + dataset + '/' + image.name, function(oImg) {
     oImg.set({
       'left': (pos_pair_x + 10 + (n_image * 32)),
-      'top': (pos_pair_y + 20)
+      'top': 0
     });
     if (!image.name.includes('train')) {
       oImg.set({
@@ -227,7 +266,6 @@ export function appendSSIM(dataset, image, n_pair, n_image) {
     oImg.scaleToWidth(28);
     oImg.scaleToHeight(28);
     oImg.on('selected', function() {
-      console.log(image.name);
       selected_paths.push(image.name);
       selected_probs.push(image.probabilities);
       update_data(selected_probs, selected_paths);
@@ -243,7 +281,7 @@ export function appendSSIM(dataset, image, n_pair, n_image) {
 }
 
 // Configuring the Cnavas Properties
-export function configureCanvas() {
+function configureCanvas() {
   // Group Properties
   fabric.Group.prototype.lockScalingX = true;
   fabric.Group.prototype.lockScalingY = true;

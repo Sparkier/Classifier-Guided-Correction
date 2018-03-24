@@ -69,7 +69,6 @@ def re_tsne(jsdata, lbl, classification, dataset):
 
 @app.route('/train_csv/<dataset>/<participant_id>')
 def train_csv(dataset, participant_id):
-    print('train')
     new_loc = os.path.join(data_location, dataset, participant_id)
     return send_file(os.path.join(new_loc, 'train_images.csv'),
                      mimetype='text/csv',
@@ -80,7 +79,6 @@ def train_csv(dataset, participant_id):
 @app.route('/ssim_csv/<dataset>/<participant_id>')
 def ssim_csv(dataset, participant_id):
     new_loc = os.path.join(data_location, dataset, participant_id)
-    print('send')
     return send_file(os.path.join(new_loc, 'ssim.csv'),
                      mimetype='text/csv',
                      attachment_filename='ssim.csv',

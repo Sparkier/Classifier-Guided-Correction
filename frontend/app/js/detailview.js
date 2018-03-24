@@ -2,26 +2,41 @@ import $ from 'jquery';
 import * as browserStore from 'storejs';
 
 const d3 = require('d3');
-var probs = [];
 var x_scale_trainclass;
 var detail_main;
-var class_size = {
-			width: 12,
-			height: 20
-		};
-var width = 510;
+var button_size = {
+	width: 460,
+	height: 30
+};
+var width = 0;
+var total_width = 0;
+var height = 0;
+var total_height = 0;
 var bar_padding = 5;
+var chart_padding = 40;
 var labels;
 var dataloc;
 var lbl;
 var cls;
+var total_chart_height;
 var participant_id;
+var margin = {
+	top: 10,
+	right: 20,
+	bottom: 10,
+	left: 20
+};
+var probs = [];
+var class_size = {
+	width: 460,
+	height: 12
+};
 
 export default function detailview(dataset, label, classification) {
+	// Standart Setup
 	dataloc = dataset;
 	lbl = label;
 	cls = classification;
-
 	participant_id = browserStore.get('participant_id');
 	if(participant_id === undefined) {
         $.ajax({
@@ -31,6 +46,10 @@ export default function detailview(dataset, label, classification) {
             browserStore.set('participant_id', data.participant_id);
         });
     }
+	
+	// Get Width of Container, Height will be calculated.
+	var myNode = document.getElementById('detailContainer');
+	total_width = myNode.clientWidth;
 
 	// Get the Classes from the text File that was used for training the labels
 	d3.text('api/labels_txt/' + dataset, function(error, retrained_labels) {
@@ -43,190 +62,248 @@ export default function detailview(dataset, label, classification) {
 			num_classes--;
 		}
 		labels = retrained_labels;
-		labels.push('');
 
 		for (var i = 0; i < num_classes; i++) {
 			probs.push(0.0);
 		}
-		probs.push(-1.0);
 		
-		/***********************************************************
-    	  Start: Initialization Variables
-	    ***********************************************************/
-		var margin = {
-			top: 0,
-			right: 20,
-			bottom: 35,
-			left: 0
-		};
-
+		// Initialization Variables
 		var start_prob = 1.0 / num_classes;
 		var prob_step_size = 0.1;
-		// Total Height of one Chart
-		var total_chart_height = (num_classes * class_size.height) + (bar_padding * num_classes);
-		var chart_padding = 50;
-		var height = total_chart_height;
-		var totalWidth = width + margin.left + margin.right;
-		var totalHeight = height + margin.top + margin.bottom;
-		var allPaths = [];
-		var allImgs = 0;
-		var prevPaths = [];
-		var buckets = [];
-		/***********************************************************
-		  End: Initialization Variables
-		***********************************************************/
+		total_chart_height = (num_classes * class_size.height + 30);
 
-		/***********************************************************
-     	  Start: Main SVG Setup
-    	***********************************************************/
+		height = 4 * (button_size.height + bar_padding);
+		width = total_width - margin.left - margin.right;
+		total_height = Math.max(height + margin.top + margin.bottom + total_chart_height + chart_padding, myNode.clientHeight - 10);
+
+		// Main SVG
 		var svg_detail = d3.select('#detailContainer')
 			.append('svg')
-			.attr('width', totalWidth)
-			.attr('height', totalHeight);
+			.attr('width', total_width)
+			.attr('height', total_height);
 
 		// Main Group for this SVG
 		detail_main = svg_detail.append('g')
-			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-		/***********************************************************
-		  End: Main SVG Setup
-		***********************************************************/
+			.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+			.attr("width", width)
+			.attr("height", height);
 	});
 };
 
 export function update_data(probabilities, paths) {
+	// Update the Selected Number of Items
+	var myNode = document.getElementById('span');
+	myNode.innerHTML = paths.length + ' Selected';
 	if(paths.length > 0) {
 		document.getElementById('detailImage').src = 'api/image/' + dataloc + '/' + paths[0];	
-		if(paths.length == 1) {
-			document.getElementById('detailHeading').innerHTML = 'Change or Confirm ' + paths.length + ' Label';
-		} else {
-			document.getElementById('detailHeading').innerHTML = 'Change or Confirm ' + paths.length + ' Labels';
-		}
 	} else {
 		document.getElementById('detailImage').src = 'api/icon/placeholder.jpg';
-		document.getElementById('detailHeading').innerHTML = 'Change or Confirm Labels';
 	}
-	
-	/***********************************************************
-      Start: Fill the probability array
-    ***********************************************************/
-	for (var i = 0; i < probs.length-1; i++) {
+
+	// Add the four Buttons
+	var texts = [];
+	var desc = [];
+	if(paths.length > 0 ) {
+		texts = [
+			'Human Correct',
+			'Computer Correct',
+			'None',
+			'Delete Items'
+		];
+		desc = [
+			'Class: ' + lbl,
+			'Class: ' + cls
+		]
+
+		// Visible Buttons
+		detail_main.selectAll('.buttonrect')
+			.data(texts)
+			.enter()
+			.append('rect')
+			.attr('x', 0)
+			.attr('y', function(d, i) {
+				if(i == 3) {
+					return total_height - margin.bottom - button_size.height - 10;
+				} else {
+					return (button_size.height * i) + (bar_padding * i);
+				}
+			})
+			.attr('height', button_size.height)
+			.attr('width', button_size.width)
+			.attr('fill', function(d, i) {
+				return 'lightgrey'
+			})
+			.attr('stroke-width', '1')
+			.attr('stroke', 'black')
+			.attr('class', 'buttonrect');
+
+		// Text for Class Label and Probability Value
+		detail_main.selectAll('.buttontext')
+			.data(texts)
+			.enter()
+			.append('text')
+			.text(function(d, i) {
+				return texts[i];
+			})
+			.attr('transform', function(d, i) {
+				if(i == 3) {
+					return 'translate('+ 5 +','+ (total_height - margin.bottom - 18) +')';
+				} else {
+					return 'translate('+ 5 +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
+				}
+			})
+			.attr('class', 'buttontext');
+
+		// Text for Class Label and Probability Value
+		detail_main.selectAll('.desctext')
+			.data(desc)
+			.enter()
+			.append('text')
+			.text(function(d, i) {
+				return desc[i];
+			})
+			.attr('transform', function(d, i) {
+				return 'translate('+ (button_size.width - 5) +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
+			})
+			.attr('class', 'desctext')
+			.attr('text-anchor', 'end')
+			.attr('font-size', '12px');
+
+		// Invisible Rect for handling Click Events
+		detail_main.selectAll('.buttoninvis')
+			.data(texts)
+			.enter()
+			.append('rect')
+			.on('click', function(d, i) {
+				if (i == 0) {
+					if (confirm("Confirm the Label?") == true) {
+						relabel(paths, lbl);
+					}
+				} else if (i == 1) {
+					if (confirm("Label these images as "+cls+"?") == true) {
+						relabel(paths, cls);
+					}
+				} else if (i == 2) {
+					var popup = document.getElementById('popup');
+					var select = document.getElementById('labelBox');
+					var cancel = document.getElementById('cancel');
+					var confirmbtn = document.getElementById('submit');
+
+					for(var item in labels) {
+						var opt = document.createElement('option');
+            			opt.value = labels[item];
+            			opt.innerHTML = labels[item];
+            			select.appendChild(opt);
+					}
+					
+					popup.style.display = "block";
+					cancel.onclick = function() {
+						popup.style.display = "none";
+					}
+					confirmbtn.onclick = function() {
+						var value = select.value;
+						relabel(paths, value)
+						popup.style.display = "none";
+					}
+				} else if (i == 3) {
+					if (confirm("Delete these Images?") == true) {
+						remove(paths);
+					}
+				}
+			})
+			.attr("class", "buttoninvis")
+			.attr('x', 0)
+			.attr('y', function(d, i) {
+				if(i == 3) {
+					return total_height - margin.bottom - button_size.height - 10;
+				} else {
+					return (button_size.height * i) + (bar_padding * i);
+				}
+			})
+			.attr('height', button_size.height)
+			.attr('width', button_size.width)
+			.attr('fill', 'transparent');
+	} else {
+		detail_main.selectAll('.buttonrect').remove();
+		detail_main.selectAll('.buttontext').remove();
+		detail_main.selectAll('.desctext').remove();
+		detail_main.selectAll('.text').remove();
+		detail_main.selectAll('.buttoninvis').remove();
+		detail_main.selectAll(".axis").remove();
+	}
+
+    // Fill the probability array
+	for (var i = 0; i < probs.length; i++) {
 		probs[i] = 0.0;
 	}
 	for (var i = 0; i < probabilities.length; i++) {
-		for (var j = 0; j <  probs.length-1; j++) {
+		for (var j = 0; j <  probs.length; j++) {
 			probs[j] = probs[j] + probabilities[i][j];
 		}
 	}
-	for (var j = 0; j <  probs.length-1; j++) {
+	for (var j = 0; j <  probs.length; j++) {
 		probs[j] = probs[j] / probabilities.length;	
 	}
-	/***********************************************************
-      End: Fill the probability array
-    ***********************************************************/
-
-    /***********************************************************
-      Start: Add bars and text to DetailView
-    ***********************************************************/
-	// Scale for visible Bars
-	x_scale_trainclass = d3.scaleLinear().domain([0.0, 1.0]).range([0.0, width]);
+	
+	// Add bars to diagram
+	x_scale_trainclass = d3.scaleLinear().domain([0.0, 1.0]).range([0.0, class_size.width - 40]);
+	var y_tick_strings = [];
+	for (var i = 0; i < labels.length; i++) {
+		y_tick_strings.push(labels[i]);
+	}
+	var y_scale_trainclass = d3.scaleBand().domain(y_tick_strings).range([total_chart_height, 0]);
+	var y_shift = (3 * (button_size.height + bar_padding)) + 40;
+	var axis = d3.axisLeft(y_scale_trainclass)
 
 	// Visible bars indicating class probabilities
-	detail_main.selectAll('rect')
-		.data(probs.slice(0, -1))
-		.attr('width', function(d) {
-			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
-		}) 
-		.enter()
-		.append('rect')
-		.attr('x', 0)
-		.attr('y', function(d, i) {
-			return (class_size.height * i) + (bar_padding * i);
-		})
-		.attr('width', function(d) {
-			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
-		}) 
-		.attr('height', class_size.height)
-		.attr('fill', 'hsl(238, 100%, 80%)')
-		.exit()
-		.remove();
-
-	// Text for Class Label and Probability Value
-	detail_main.selectAll('text')
-		.data(labels)
-		.text(function(d, i) {
-			if (isNaN(probs[i])) {
-				return ('');
-			} else if (i == labels.length-1) {
-				if (isNaN(probs[0])) {
-					return '';
-				} else {
-					return ('Remove Items from Dataset');
-				}
-			} else {
-				return (d + ': ' + (probs[i].toFixed(2)) + '%');
-			}
-		})
-		.enter()
-		.append('text')
-		.text(function(d, i) {
-			if (isNaN(probs[i])) {
-				return ('');
-			} else if (i == labels.length-1) {
-				if (isNaN(probs[0])) {
-					return '';
-				} else {
-					return ('Remove Items from Dataset');
-				}
-			} else {
-				return (d + ': ' + (probs[i].toFixed(2)) + '%');
-			}
-		})
-		.attr('transform', function(d, i) {
-			return 'translate('+ 5 +','+ ((class_size.height * (i+1)) + (bar_padding * i) - 4) +')';
-		})
-		.exit()
-		.remove();
-
-	// Invisible Rect for handling Click Events
-	detail_main.selectAll('.rect_invis')
+	detail_main.selectAll('.rectdiag')
 		.data(probs)
-		.on('click', function(d, i) {
-			if(paths.length > 0) {
-				if (i == labels.length-1) {
-					if (confirm("Remove these images from the Dataset?") == true) {
-					   remove(paths);
-				  }
-				} else {
-					if (confirm("Label these images as "+labels[i]+" and remove them from this Visualization?") == true) {
-					   relabel(paths, i);
-				  }
-				}
-			}
-        })
+		.attr('width', function(d) {
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
+		}) 
 		.enter()
 		.append('rect')
-		.attr("class", "rect_invis")
-		.attr('x', 0)
+		.attr('x', 30)
 		.attr('y', function(d, i) {
-			return (class_size.height * i) + (bar_padding * i);
+			return (class_size.height * (labels.length - i - 1)) + y_shift;
 		})
-		.attr('width', x_scale_trainclass(1.0)) 
+		.attr('width', function(d) {
+			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
+		}) 
 		.attr('height', class_size.height)
-		.attr('fill', 'transparent')
+		.attr('fill', '#A32638')
+		.attr('class', 'rectdiag')
 		.exit()
 		.remove();
-	/***********************************************************
-      End: Add bars and text to DetailView
-    ***********************************************************/
+
+	if(paths.length > 0) {
+		// Text for the Diagram
+		detail_main.append('text')
+			.text('Score Distribution')
+			.attr('transform', function(d, i) {
+				return 'translate('+ 20 +','+ (y_shift - 10) +')';
+			})
+			.attr('class', 'desctext')
+			.attr('font-size', '12px');
+
+		// Y-Axis
+		detail_main.append('g')
+			.attr('transform', 'translate(' + 30 + ',' + y_shift + ')')
+			.attr('class', 'axis')
+			.call(d3.axisLeft(y_scale_trainclass));
+	
+		detail_main.append('g')
+			.attr('transform', 'translate(' + 30 + ',' + (y_shift + total_chart_height) + ')')
+			.attr('class', 'axis')
+			.call(d3.axisBottom(x_scale_trainclass));
+	}
 };
 
 function relabel(paths, new_label) {
 	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id, function(error, data) {
-		/***********************************************************
-		  Start: Convert all images
-		***********************************************************/
-		images = [];
+	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
+		// Convert images
+		var images = [];
 		data.forEach(function(d) {
 			d.image = +d.image;
 			d.label = +d.label;
@@ -256,19 +333,14 @@ function relabel(paths, new_label) {
     		}
 		}
   		xhttp.send(json);
-		/***********************************************************
-		  End: Convert all images
-		***********************************************************/
 	});
 };
 
 function remove(paths) {
 	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id, function(error, data) {
-		/***********************************************************
-		  Start: Convert all images
-		***********************************************************/
-		images = [];
+	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
+		// Remove images
+		var images = [];
 		data.forEach(function(d) {
 			d.image = +d.image;
 			d.label = +d.label;
@@ -296,8 +368,5 @@ function remove(paths) {
     		}
 		}
   		xhttp.send(json);
-		/***********************************************************
-		  End: Convert all images
-		***********************************************************/
 	});
 }
