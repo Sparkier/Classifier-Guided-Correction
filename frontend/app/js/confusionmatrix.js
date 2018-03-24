@@ -479,7 +479,7 @@ export default function confusionmatrix(dataset) {
 						.attr('opacity', '0.0');
 				}
 
-				if(!ssimAdded && !buckAdded) {
+				if(!ssimAdded) {
 					window.location.href = "survey.html";
 				}
 			}

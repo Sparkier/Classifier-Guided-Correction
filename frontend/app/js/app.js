@@ -11,14 +11,16 @@ $(() => {
     const client = new ClientJS();
     var dataset = 'mnist_video';
     var location = window.location.href.toString().split(window.location.host)[1];
-    const participant_id = browserStore.get('participant_id');
+    var participant_id = browserStore.get('participant_id');
     var timer = false;
+    var finished = false;
 
     if(participant_id === undefined) {
         $.ajax({
             method: 'GET',
             url: '/api/participant_id/' + dataset
         }).done((data) => {
+            participant_id = data.participant_id;
             browserStore.set('participant_id', data.participant_id);
             storeBrowserInfo(data.participant_id);
         });
@@ -49,6 +51,10 @@ $(() => {
             demographics(dataset);
         } else if (location == '/confusion.html') {
             if(!timer) {
+                $.ajax({
+                    method: 'GET',
+                    url: '/api/deconfusion_start/' + dataset + '/' + participant_id
+                })
                 timer = true;
                 setTimeout(function () {
                     window.location.href = "survey.html";
@@ -56,6 +62,13 @@ $(() => {
             }
             confusionmatrix(dataset);
         } else if (location == '/survey.html') {
+            if(!finished) {
+                $.ajax({
+                    method: 'GET',
+                    url: '/api/deconfusion_end/' + dataset + '/' + participant_id
+                })
+                finished = true;
+            }
             survey_final(dataset);
         } else if (location == '/video.html'){
 

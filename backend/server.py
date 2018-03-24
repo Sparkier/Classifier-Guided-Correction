@@ -6,6 +6,7 @@ import uuid
 from flask import jsonify
 from shutil import copyfile, move
 import json
+import time
 
 app = Flask(__name__)
 #data_location = '/hdd/Data/Erroneous_Training_Data_Backend/'
@@ -273,5 +274,25 @@ def client_survey(dataset, participant_id):
 
     result = jsonify({'success': True})
     return result, ok_status, json_type
+
+
+@app.route('/deconfusion_start/<dataset>/<participant_id>', methods=['GET'])
+def deconfusion_start(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    file = open(os.path.join(new_loc, 'starttime.txt'),'w') 
+    file.write(str(time.time())) 
+    file.close()
+    return ('', 204)
+
+
+@app.route('/deconfusion_end/<dataset>/<participant_id>', methods=['GET'])
+def deconfusion_end(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    file = open(os.path.join(new_loc, 'endtime.txt'),'w') 
+    file.write(str(time.time()))
+    file.close()
+    print('hallo')
+    return ('', 204)
+    
 
 app.run(debug=True)
