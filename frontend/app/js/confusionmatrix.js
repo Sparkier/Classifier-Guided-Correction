@@ -150,7 +150,6 @@ export default function confusionmatrix(dataset) {
 						ssim_buckets[d.label * num_classes + d.class].max_ssim = d.max_ssim;
 						ssim_buckets[d.label * num_classes + d.class].avg_ssim = d.avg_ssim;
 					});
-					console.log(ssim_buckets)
 					redraw();
 				});
 			}
@@ -197,6 +196,8 @@ export default function confusionmatrix(dataset) {
 				var area_scale_y = d3.scaleLinear().domain([start_prob, 1.0]).range([total_chart_height - 
 																					rect_height, 0.0]);
 				
+				var buckAdded = false;
+				var ssimAdded = false;
 				// Add Cells for each Incorrect Bucket
 				for (var i = 0; i < num_classes; i++) {
 					for (var j = 0; j < num_classes - 1; j++) {
@@ -208,6 +209,7 @@ export default function confusionmatrix(dataset) {
 						// Get the Current Bucket with its properties.
 						var buck = buckets[class_number * num_classes + label_number];
 						if (buck.num_total != 0) {
+							buckAdded = true;
 							// Only saturate when at least 0.1*score_wrong.
 							var saturation = 0;
 							if(buck.num_total >= (score_wrong * 0.1)) {
@@ -253,6 +255,7 @@ export default function confusionmatrix(dataset) {
 
 							// Add SSIM Indicators where appropriate.
 							if (ssim_buckets[label_number * num_classes + class_number].max_ssim > 0.95) {
+								ssimAdded = true;
 								var dim = Math.min(total_chart_width, total_chart_height)
 								confusion_main.append('svg:image')
 									.attr('xlink:href', 'api/icon/duplicates.png')
@@ -316,6 +319,7 @@ export default function confusionmatrix(dataset) {
 
 					// Add SSIM Indicator if neccessary.
 					if (ssim_buckets[i * num_classes + i].max_ssim > 0.95) {
+						ssimAdded = true;
 						var dim = Math.min(total_chart_width, total_chart_height)
 						svg_confusion.append('svg:image')
 							.attr('xlink:href', 'api/icon/duplicates.png')
@@ -473,6 +477,10 @@ export default function confusionmatrix(dataset) {
 						.attr('y', 0)
 						.attr('height', 0)
 						.attr('opacity', '0.0');
+				}
+
+				if(!ssimAdded && !buckAdded) {
+					window.location.href = "survey.html";
 				}
 			}
 		});
