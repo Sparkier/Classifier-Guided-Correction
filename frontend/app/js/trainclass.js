@@ -49,7 +49,7 @@ export default function trainclass(dataset, label, classification) {
 		***********************************************************/
 
 		// Load the Image Classification Results
-		d3.tsv('api/train_csv/' + dataset + '/' + participant_id, function(error, data) {
+		d3.tsv('api/train_csv/' + dataset + '/' + participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 			// Convert all Items  
 			data.forEach(function(d) {
 				// image,label,class,percentage
@@ -74,7 +74,7 @@ export default function trainclass(dataset, label, classification) {
 			});
 
 			// Load SSIM Results
-			d3.tsv('api/class_ssim_csv/' + dataset + '/' + label + '/' + classification, function(error, data) {
+			d3.tsv('api/class_ssim_csv/' + dataset + '/' + label + '/' + classification + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 				
 				var ssim = []; 
 				data.forEach(function(d) {

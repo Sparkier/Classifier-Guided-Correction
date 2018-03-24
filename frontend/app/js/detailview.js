@@ -291,7 +291,7 @@ export function update_data(probabilities, paths) {
 
 function relabel(paths, new_label) {
 	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id, function(error, data) {
+	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 		/***********************************************************
 		  Start: Convert all images
 		***********************************************************/
@@ -333,7 +333,7 @@ function relabel(paths, new_label) {
 
 function remove(paths) {
 	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id, function(error, data) {
+	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 		/***********************************************************
 		  Start: Convert all images
 		***********************************************************/
