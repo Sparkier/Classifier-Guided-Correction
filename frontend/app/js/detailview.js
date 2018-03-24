@@ -70,7 +70,7 @@ export default function detailview(dataset, label, classification) {
 		// Initialization Variables
 		var start_prob = 1.0 / num_classes;
 		var prob_step_size = 0.1;
-		total_chart_height = (num_classes * class_size.height);
+		total_chart_height = (num_classes * class_size.height + 30);
 
 		height = 4 * (button_size.height + bar_padding);
 		width = total_width - margin.left - margin.right;
@@ -227,6 +227,7 @@ export function update_data(probabilities, paths) {
 		detail_main.selectAll('.buttonrect').remove();
 		detail_main.selectAll('.buttontext').remove();
 		detail_main.selectAll('.desctext').remove();
+		detail_main.selectAll('.text').remove();
 		detail_main.selectAll('.buttoninvis').remove();
 		detail_main.selectAll(".axis").remove();
 	}
@@ -251,9 +252,9 @@ export function update_data(probabilities, paths) {
 		y_tick_strings.push(labels[i]);
 	}
 	var y_scale_trainclass = d3.scaleBand().domain(y_tick_strings).range([total_chart_height, 0]);
-	var y_shift = (3 * (button_size.height + bar_padding)) + 10;
+	var y_shift = (3 * (button_size.height + bar_padding)) + 40;
 	var axis = d3.axisLeft(y_scale_trainclass)
-	
+
 	// Visible bars indicating class probabilities
 	detail_main.selectAll('.rectdiag')
 		.data(probs)
@@ -276,6 +277,15 @@ export function update_data(probabilities, paths) {
 		.remove();
 
 	if(paths.length > 0) {
+		// Text for the Diagram
+		detail_main.append('text')
+			.text('Score Distribution')
+			.attr('transform', function(d, i) {
+				return 'translate('+ 20 +','+ (y_shift - 10) +')';
+			})
+			.attr('class', 'desctext')
+			.attr('font-size', '12px');
+
 		// Y-Axis
 		detail_main.append('g')
 			.attr('transform', 'translate(' + 30 + ',' + y_shift + ')')
@@ -292,9 +302,7 @@ export function update_data(probabilities, paths) {
 function relabel(paths, new_label) {
 	// Load the Image Classification Results
 	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
-		/***********************************************************
-		  Start: Convert all images
-		***********************************************************/
+		// Convert images
 		var images = [];
 		data.forEach(function(d) {
 			d.image = +d.image;
@@ -325,18 +333,13 @@ function relabel(paths, new_label) {
     		}
 		}
   		xhttp.send(json);
-		/***********************************************************
-		  End: Convert all images
-		***********************************************************/
 	});
 };
 
 function remove(paths) {
 	// Load the Image Classification Results
 	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
-		/***********************************************************
-		  Start: Convert all images
-		***********************************************************/
+		// Remove images
 		var images = [];
 		data.forEach(function(d) {
 			d.image = +d.image;
@@ -365,8 +368,5 @@ function remove(paths) {
     		}
 		}
   		xhttp.send(json);
-		/***********************************************************
-		  End: Convert all images
-		***********************************************************/
 	});
 }
