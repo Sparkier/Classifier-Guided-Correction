@@ -1,8 +1,9 @@
 import trainclass from './trainclass';
 import confusionmatrix from './confusionmatrix';
 import detailview from './detailview';
-import demographics from './demographics'
-import survey_final from './survey'
+import demographics from './demographics';
+import survey_final from './survey';
+import images_explanation from './images_explanation';
 import $ from 'jquery';
 import * as browserStore from 'storejs';
 import 'clientjs';
@@ -72,6 +73,8 @@ $(() => {
             survey_final(dataset);
         } else if (location == '/video.html'){
 
+        } else if (location == '/images_explanation.html'){
+            images_explanation(dataset);
         } else {
             var label = findGetParameter('label');
             var classification = findGetParameter('class');

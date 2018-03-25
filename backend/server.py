@@ -124,7 +124,7 @@ def image(dataset, part, label, image):
 
 @app.route('/icon/<name>')
 def icon(name):
-    image_location = 'Icons/' + name
+    image_location = os.path.join(data_location, 'other', 'icons', name)
     return send_file(image_location,
                      mimetype='image/jpeg',
                      attachment_filename='image.jpeg',
