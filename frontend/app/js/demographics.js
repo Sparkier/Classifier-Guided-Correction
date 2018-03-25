@@ -42,7 +42,7 @@ export default function demographics(dataset) {
             contentType: 'application/json'
         }).done(() => {
             setTimeout(function () {
-                window.location.href = "video.html";
+                window.location.href = "images_explanation.html";
             }, 10000);
         });
     }
