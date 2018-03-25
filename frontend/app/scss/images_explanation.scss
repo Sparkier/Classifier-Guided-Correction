@@ -1,0 +1,16 @@
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.imageElement {
+    height: 90%;
+    width: 100%;
+}
+
+.controlsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

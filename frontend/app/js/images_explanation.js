@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import * as browserStore from 'storejs';
 
 export default function images_explanation(dataset) {   
     const participant_id = browserStore.get('participant_id');
@@ -14,7 +15,17 @@ export default function images_explanation(dataset) {
         dispatch();
     }
 
+    var next = document.getElementById('nextButton');
+    next.onclick = function() {
+        complete();
+    }
+
     function dispatch() {
+        var img = document.createElement("img");
+        img.src = "http://www.google.com/intl/en_com/images/logo_plain.png";
+
+        var src = document.getElementById("imageElement");
+        src.appendChild(img);
     }
 
     function complete() {
