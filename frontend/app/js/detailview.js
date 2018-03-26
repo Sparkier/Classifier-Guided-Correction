@@ -33,6 +33,8 @@ var class_size = {
 };
 
 export default function detailview(dataset, label, classification) {
+	var loader = document.getElementById('loader');
+	loader.style.display = "none";
 	// Standart Setup
 	dataloc = dataset;
 	lbl = label;
@@ -281,6 +283,9 @@ export function update_data(probabilities, paths) {
 };
 
 function relabel(paths, new_label) {
+	var loader = document.getElementById('loader');
+	loader.style.display = "flex";
+
 	// Load the Image Classification Results
 	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 		// Convert images
@@ -318,6 +323,9 @@ function relabel(paths, new_label) {
 };
 
 function remove(paths) {
+	var loader = document.getElementById('loader');
+	loader.style.display = "flex";
+
 	// Load the Image Classification Results
 	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 		// Remove images
