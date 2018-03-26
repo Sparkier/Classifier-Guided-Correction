@@ -2,7 +2,7 @@ import $ from 'jquery';
 import * as browserStore from 'storejs';
 
 export default function images_explanation(dataset) { 
-    var images = ['placeholder.jpg'];
+    var images = ['dogcat_correct.jpg', 'mnist_correct.jpg', 'mnist_false.jpg'];
     var i = 0;
 
     const participant_id = browserStore.get('participant_id');
@@ -20,10 +20,10 @@ export default function images_explanation(dataset) {
 
     var next = document.getElementById('nextButton');
     next.onclick = function() {
-        if (i < images.length) {
-            var img = document.getElementById("explainImage");
-            img.src = 'api/explain_image/' + images[i];
+        if (i < (images.length - 1)) {
             i++;
+            var img = document.getElementById("explainImage");
+            img.src = 'api/explain_images/' + images[i];
         } else {
             complete();
         }
@@ -31,12 +31,16 @@ export default function images_explanation(dataset) {
 
     var previous = document.getElementById('previousButton');
     previous.onclick = function() {
-        
+        if (i > 0){
+            i--;
+            var img = document.getElementById("explainImage");
+            img.src = 'api/explain_images/' + images[i];
+        }
     }
 
     function dispatch() {
         var img = document.getElementById("explainImage");
-        img.src = "http://www.google.com/intl/en_com/images/logo_plain.png";
+        img.src = 'api/explain_images/' + images[i];
     }
 
     function complete() {

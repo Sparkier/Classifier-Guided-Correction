@@ -295,8 +295,8 @@ def deconfusion_end(dataset, participant_id):
     return ('', 204)
 
 
-@app.route('/explain_image/<name>')
-def icon(name):
+@app.route('/explain_images/<name>')
+def explain_image(name):
     image_location = os.path.join(data_location, 'other', 'explain_images', name)
     return send_file(image_location,
                      mimetype='image/jpeg',

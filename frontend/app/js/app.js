@@ -10,7 +10,7 @@ import 'clientjs';
 
 $(() => {
     const client = new ClientJS();
-    var dataset = 'mnist_video';
+    var dataset = 'mnist_mod';
     var location = window.location.href.toString().split(window.location.host)[1];
     var participant_id = browserStore.get('participant_id');
     var timer = false;

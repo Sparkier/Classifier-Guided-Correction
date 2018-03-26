@@ -265,7 +265,7 @@ export function update_data(probabilities, paths) {
 		.append('rect')
 		.attr('x', 30)
 		.attr('y', function(d, i) {
-			return (class_size.height * (labels.length - i - 1)) + y_shift;
+			return y_scale_trainclass(i) + y_shift;
 		})
 		.attr('width', function(d) {
 			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);

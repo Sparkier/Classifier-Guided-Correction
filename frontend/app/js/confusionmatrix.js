@@ -318,15 +318,14 @@ export default function confusionmatrix(dataset) {
 						.attr('opacity', '0.5');
 
 					// Add SSIM Indicator if neccessary.
-					if (ssim_buckets[i * num_classes + i].max_ssim > 0.95) {
+					if (ssim_buckets[label_number * num_classes + label_number].max_ssim > 0.99) {
 						ssimAdded = true;
 						var dim = Math.min(total_chart_width, total_chart_height)
 						svg_confusion.append('svg:image')
 							.attr('xlink:href', 'api/icon/duplicates.png')
-							.attr('x', (buck.label * (total_chart_width + chart_padding) + (chart_padding / 2) + 
-								((total_chart_width - dim)/2)))
-							.attr('y', (buck.class * (total_chart_height + chart_padding) + (chart_padding / 2) + 
-								((total_chart_height - dim)/2)))
+							.attr('x', ((total_chart_width-dim)/2))
+							.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
+							(chart_padding.vertical / 2) + margin.top))
 							.attr('width', dim)
 							.attr('height', dim);
 					}
@@ -479,7 +478,7 @@ export default function confusionmatrix(dataset) {
 						.attr('opacity', '0.0');
 				}
 
-				if(!ssimAdded) {
+				if(!ssimAdded && !buckAdded) {
 					window.location.href = "survey.html";
 				}
 			}
