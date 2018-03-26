@@ -1,0 +1,26 @@
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.imageElement {
+    height: 90%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.explainImage {
+    width: 70%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+} 
+
+.controlsContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
