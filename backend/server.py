@@ -55,12 +55,13 @@ def remove(dataset, location):
 
 def re_tsne(jsdata, lbl, classification, dataset):
     re_tsne_data = []
-    for i in range(0, len(jsdata)):
-        current = jsdata[i]
-        if (int(current['class']) == int(classification) and
-                int(current['label']) == int(lbl) and
-                int(current['confirmed']) == 0):
-            re_tsne_data.append(current)
+    if(lbl != classification):
+        for i in range(0, len(jsdata)):
+            current = jsdata[i]
+            if (int(current['class']) == int(classification) and
+                    int(current['label']) == int(lbl) and
+                    int(current['confirmed']) == 0):
+                re_tsne_data.append(current)
 
     new_vals = []
     if len(re_tsne_data) > 5:

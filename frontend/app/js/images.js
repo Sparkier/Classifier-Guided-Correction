@@ -43,7 +43,9 @@ export function load_images(dataset, images, num_images, correct) {
   } else {
     // No t-SNE
     var num_per_line = Math.floor(width / 32);
-    var num_lines = images.length / num_per_line + 1;
+    var num_lines = Math.ceil(images.length / num_per_line + 1);
+    var num_per_line_quadr = Math.ceil(Math.sqrt(images.length));
+    var num_lines_quadr = images.length / num_per_line_quadr;
 
     // Sort the images
     images.sort(function(a, b) {
@@ -53,7 +55,9 @@ export function load_images(dataset, images, num_images, correct) {
       }
     });
 
-    if((num_lines * 32) > height) {
+    console.log((num_lines_quadr * 32));
+    console.log(height);
+    if((num_lines_quadr * 32) > height) {
       // Add the Canvas and Configure it
       myNode.appendChild(newCanvas);
       canvas = new fabric.Canvas(newCanvas, {
@@ -74,16 +78,14 @@ export function load_images(dataset, images, num_images, correct) {
         height: height
       });
       configureCanvas();
-      var num_per_line = Math.ceil(Math.sqrt(images.length));
-      var num_lines = images.length / num_per_line;
-      var imgs_width = num_per_line * 32;
-      var imgs_height = num_lines * 32;
+      var imgs_width = num_per_line_quadr * 32;
+      var imgs_height = num_lines_quadr * 32;
 
       var start_x = (width / 2) - (imgs_width / 2);
       var start_y = (height / 2) - (imgs_height / 2);
 
       for(var i = 0; i < images.length; i++) {
-        appendQuadratic(dataset, images[i], i, start_x, start_y, num_per_line);
+        appendQuadratic(dataset, images[i], i, start_x, start_y, num_per_line_quadr);
       }
     }
   }

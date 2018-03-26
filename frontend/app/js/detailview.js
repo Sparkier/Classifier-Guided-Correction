@@ -105,15 +105,11 @@ export function update_data(probabilities, paths) {
 	var desc = [];
 	if(paths.length > 0 ) {
 		texts = [
-			'Human Correct',
-			'Computer Correct',
+			'Label ' + lbl + ' Correct',
+			'Label ' + cls + ' Correct',
 			'None',
 			'Delete Items'
 		];
-		desc = [
-			'Class: ' + lbl,
-			'Class: ' + cls
-		]
 
 		// Visible Buttons
 		detail_main.selectAll('.buttonrect')
@@ -131,7 +127,7 @@ export function update_data(probabilities, paths) {
 			.attr('height', button_size.height)
 			.attr('width', button_size.width)
 			.attr('fill', function(d, i) {
-				return 'lightgrey'
+				return 'white'
 			})
 			.attr('stroke-width', '1')
 			.attr('stroke', 'black')
@@ -153,21 +149,6 @@ export function update_data(probabilities, paths) {
 				}
 			})
 			.attr('class', 'buttontext');
-
-		// Text for Class Label and Probability Value
-		detail_main.selectAll('.desctext')
-			.data(desc)
-			.enter()
-			.append('text')
-			.text(function(d, i) {
-				return desc[i];
-			})
-			.attr('transform', function(d, i) {
-				return 'translate('+ (button_size.width - 5) +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
-			})
-			.attr('class', 'desctext')
-			.attr('text-anchor', 'end')
-			.attr('font-size', '12px');
 
 		// Invisible Rect for handling Click Events
 		detail_main.selectAll('.buttoninvis')
