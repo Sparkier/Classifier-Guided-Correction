@@ -2,7 +2,9 @@ import $ from 'jquery';
 import * as browserStore from 'storejs';
 
 export default function images_explanation(dataset) { 
-    var images = ['dogcat_correct.jpg', 'mnist_correct.jpg', 'mnist_false.jpg'];
+    var images = ['dogcat_correct.jpg', 'mnist_correct.jpg', 'mnist_false.jpg', 'vis.jpg', 'vis_left.jpg', 
+        'vis_left_row.jpg', 'vis_left_row2.jpg', 'vis_computer.jpg', 'vis_computer_expl.jpg', 'vis_computer_expl2.jpg',
+        '3errors.jpg', 'vid.jpg'];
     var i = 0;
 
     const participant_id = browserStore.get('participant_id');
@@ -24,6 +26,9 @@ export default function images_explanation(dataset) {
             i++;
             var img = document.getElementById("explainImage");
             img.src = 'api/explain_images/' + images[i];
+            if(i ==  images.length-1) {
+                document.getElementById('nextButton').firstChild.data = 'Finish';
+            }
         } else {
             complete();
         }
