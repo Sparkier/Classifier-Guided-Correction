@@ -37,17 +37,12 @@ export default function trainclass(dataset, label, classification) {
 		// Set the text of the Classification Heading
 		document.getElementById("classHeading").innerHTML = 'Human: ' + retrained_labels[label] + ' Computer: ' + retrained_labels[classification];
 
-		/***********************************************************
-			Start: Initialization Variables
-		***********************************************************/
+		// Initialization Variables
 		var all_images = []
 		var allImgs = 0;
 		var min = 0.0;
 		var max = 1.0;
-		/***********************************************************
-			End: Initialization Variables
-		***********************************************************/
-
+		
 		// Load the Image Classification Results
 		d3.tsv('api/train_csv/' + dataset + '/' + participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
 			// Convert all Items  
@@ -72,6 +67,10 @@ export default function trainclass(dataset, label, classification) {
 					}
 				}
 			});
+
+			if(all_images == 0) {
+				window.history.back();
+			}
 
 			// Load SSIM Results
 			d3.tsv('api/class_ssim_csv/' + dataset + '/' + label + '/' + classification + '?' + Math.floor(Math.random() * 10000), function(error, data) {
