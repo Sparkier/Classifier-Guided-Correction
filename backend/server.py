@@ -165,77 +165,29 @@ def confirm_images(dataset, participant_id, label, classification):
     return ('', 204)
 
 
-@app.route('/modify_csv/<dataset>/<lbl>/<classification>/<participant_id>', methods=['POST'])
-def modify_csv(dataset, lbl, classification, participant_id):
-    jsdata = request.get_json()
-    new_tsne = re_tsne(jsdata, lbl, classification, (data_location + dataset))
-    labels = get_labels(dataset)
-
-    # Write Classification Results into CSV File
+@app.route('/delete_images/<dataset>/<participant_id>/<label>/<classification>', methods=['POST'])
+def delete_images(dataset, participant_id, label, classification):
+    paths = request.form.getlist('arr[]')
+    to_write = []
+    to_tsne = []
     new_loc = os.path.join(data_location, dataset, participant_id)
-    output_file = os.path.join(new_loc, 'train_images.csv')
-    test_writer = csv.writer(open(output_file, 'w'), delimiter='\t')
-    test_writer.writerow(['image', 'label', 'class', 'percentage', 'name',
-                          'probabilities', 'confirmed', 'tsne_saliency'])
-    image_number = 0
-    while image_number < len(jsdata):
-        current = jsdata[image_number]
-        image = current['image']
-        label = current['label']
-        clas = current['class']
-        percentage = current['percentage']
-        name = current['name']
-        probabilities = current['probabilities']
-        confirmed = current['confirmed']
-        tsne_saliency = current['tsne_saliency']
-        for t in new_tsne:
-            if (t[0]['name'] == name):
-                tsne_saliency = t[1]
-        label_txt = labels[int(label)]
-        name = should_move(dataset, name, label_txt)
-        test_writer.writerow([image, label, clas, percentage, name,
-                              probabilities, confirmed, tsne_saliency])
-        image_number = image_number + 1
-    return ('', 204)
-
-
-@app.route('/modify_delete/<dataset>/<lbl>/<classification>/<participant_id>', methods=['POST'])
-def modify_delete(dataset, lbl, classification, participant_id):
-    jsdata = request.get_json()
-    new_tsne = re_tsne(jsdata, lbl, classification, (data_location + dataset))
-
-    # Write Classification Results into CSV File
-    new_loc = os.path.join(data_location, dataset, participant_id)
-    output_file = os.path.join(new_loc, 'train_images.csv')
-    test_writer = csv.writer(open(output_file, 'w'), delimiter='\t')
-    test_writer.writerow(['image', 'label', 'class', 'percentage', 'name',
-                          'probabilities', 'confirmed', 'tsne_saliency'])
-    image_number = 0
-    while image_number < len(jsdata):
-        current = jsdata[image_number]
-        image = current['image']
-        label = current['label']
-        clas = current['class']
-        percentage = current['percentage']
-        name = current['name']
-        probabilities = current['probabilities']
-        confirmed = current['confirmed']
-        tsne_saliency = current['tsne_saliency']
-        for t in new_tsne:
-            if (t[0]['name'] == name):
-                tsne_saliency = t[1]
-        if not should_delete(confirmed):
-            test_writer.writerow([image, label, clas, percentage, name,
-                                  probabilities, confirmed, tsne_saliency])
-        # else:
-            # remove(dataset, name)
-        image_number = image_number + 1
+    readCSV = csv.reader(open(os.path.join(new_loc, 'train_images.csv')), delimiter='\t')
+    to_write.append(next(readCSV))
+    for row in readCSV:
+        if not(row[4] in paths):
+            if(int(row[1]) == int(label) and int(row[2]) == int(classification) and (not (row[4] in paths))):
+                to_tsne.append(row)
+            to_write.append(row)
+    to_write = redo_tsne(os.path.join(data_location, dataset), to_tsne, to_write, label, classification)
+    writeCSV = csv.writer(open(os.path.join(new_loc, 'train_images.csv'), 'w'), delimiter='\t')
+    for r in to_write:
+        writeCSV.writerow(r)  
 
     readCSV = csv.reader(open(os.path.join(new_loc, 'ssim.csv')), delimiter='\t')
     to_write = []
     to_write.append(next(readCSV))
     for row in readCSV:
-        if(int(row[0]) == int(lbl) and int(row[1]) == int(classification)):
+        if(int(row[0]) == int(label) and int(row[1]) == int(classification)):
             row[2] = str(0.5)
             row[3] = str(0.5)
         to_write.append(row)
