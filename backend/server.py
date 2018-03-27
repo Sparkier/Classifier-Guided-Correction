@@ -45,28 +45,16 @@ def should_delete(confirmed):
         return False
 
 
-def move(old_location, new_location):
-    os.rename(old_location, new_location)
-
-
-def remove(dataset, location):
-    os.remove(data_location + dataset+'/'+location)
-
-
-def re_tsne(jsdata, lbl, classification, dataset):
-    re_tsne_data = []
-    if(lbl != classification):
-        for i in range(0, len(jsdata)):
-            current = jsdata[i]
-            if (int(current['class']) == int(classification) and
-                    int(current['label']) == int(lbl) and
-                    int(current['confirmed']) == 0):
-                re_tsne_data.append(current)
-
+def redo_tsne(new_loc, to_tsne, to_write, label, classification):
     new_vals = []
-    if len(re_tsne_data) > 5:
-        new_vals = rt.re_tsne(re_tsne_data, dataset)
-    return new_vals
+    if(label != classification):
+        if(len(to_tsne) > 5):
+            new_vals = rt.re_tsne(to_tsne, new_loc)
+    for i in new_vals:
+        for j in range(0, len(to_write)):
+            if(i[4] == to_write[j][4]):
+                to_write[j] = i
+    return to_write
 
 
 @app.route('/train_csv/<dataset>/<participant_id>')
@@ -130,6 +118,51 @@ def icon(name):
                      mimetype='image/jpeg',
                      attachment_filename='image.jpeg',
                      as_attachment=True)
+
+
+@app.route('/relabel_images/<dataset>/<participant_id>/<label>/<classification>', methods=['POST'])
+def relabel_images(dataset, participant_id, label, classification):
+    paths = request.form.getlist('arr[]')
+    to_write = []
+    to_tsne = []
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    readCSV = csv.reader(open(os.path.join(new_loc, 'train_images.csv')), delimiter='\t')
+    to_write.append(next(readCSV))
+    for row in readCSV:
+        if(row[4] in paths):
+            row[1] = str(classification)
+            row[6] = str(1)
+        elif(int(row[1]) == int(label) and int(row[2]) == int(classification)):
+            to_tsne.append(row)
+        to_write.append(row)
+    to_write = redo_tsne(os.path.join(data_location, dataset), to_tsne, to_write, label, classification)
+    writeCSV = csv.writer(open(os.path.join(new_loc, 'train_images.csv'), 'w'), delimiter='\t')
+    for r in to_write:
+        writeCSV.writerow(r)  
+
+    return ('', 204)
+
+
+@app.route('/confirm_images/<dataset>/<participant_id>/<label>/<classification>', methods=['POST'])
+def confirm_images(dataset, participant_id, label, classification):
+    paths = request.form.getlist('arr[]')
+    to_write = []
+    to_tsne = []
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    readCSV = csv.reader(open(os.path.join(new_loc, 'train_images.csv')), delimiter='\t')
+    to_write.append(next(readCSV))
+    for row in readCSV:
+        if(row[4] in paths):
+            row[6] = str(1)
+        elif(int(row[1]) == int(label) and int(row[2]) == int(classification)):
+            to_tsne.append(row)
+        to_write.append(row)
+    to_write = redo_tsne(os.path.join(data_location, dataset), to_tsne, to_write, label, classification)
+    writeCSV = csv.writer(open(os.path.join(new_loc, 'train_images.csv'), 'w'), delimiter='\t')
+    for r in to_write:
+        writeCSV.writerow(r)  
+
+    return ('', 204)
 
 
 @app.route('/modify_csv/<dataset>/<lbl>/<classification>/<participant_id>', methods=['POST'])
@@ -198,7 +231,6 @@ def modify_delete(dataset, lbl, classification, participant_id):
             # remove(dataset, name)
         image_number = image_number + 1
 
-    new_loc = os.path.join(data_location, dataset, participant_id)
     readCSV = csv.reader(open(os.path.join(new_loc, 'ssim.csv')), delimiter='\t')
     to_write = []
     to_write.append(next(readCSV))
@@ -206,9 +238,7 @@ def modify_delete(dataset, lbl, classification, participant_id):
         if(int(row[0]) == int(lbl) and int(row[1]) == int(classification)):
             row[2] = str(0.5)
             row[3] = str(0.5)
-            to_write.append(row)
-        else:
-            to_write.append(row)
+        to_write.append(row)
 
     writeCSV = csv.writer(open(os.path.join(new_loc, 'ssim.csv'), 'w'), delimiter='\t')
     for r in to_write:
@@ -303,6 +333,6 @@ def explain_image(name):
                      mimetype='image/jpeg',
                      attachment_filename='image.jpeg',
                      as_attachment=True)
-    
+
 
 app.run(debug=True)

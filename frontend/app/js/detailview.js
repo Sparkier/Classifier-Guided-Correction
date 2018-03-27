@@ -160,11 +160,11 @@ export function update_data(probabilities, paths) {
 			.on('click', function(d, i) {
 				if (i == 0) {
 					if (confirm("Confirm the Label?") == true) {
-						relabel(paths, lbl);
+						confirm_images(paths);
 					}
 				} else if (i == 1) {
 					if (confirm("Label these images as "+cls+"?") == true) {
-						relabel(paths, cls);
+						relabel_images(paths);
 					}
 				} else if (i == 2) {
 					var popup = document.getElementById('popup');
@@ -282,43 +282,33 @@ export function update_data(probabilities, paths) {
 	}
 };
 
-function relabel(paths, new_label) {
+function relabel_images(paths) {
 	var loader = document.getElementById('loader');
 	loader.style.display = "flex";
-
-	// Load the Image Classification Results
-	d3.tsv('api/train_csv/' + dataloc + '/' +  participant_id + '?' + Math.floor(Math.random() * 10000), function(error, data) {
-		// Convert images
-		var images = [];
-		data.forEach(function(d) {
-			d.image = +d.image;
-			d.label = +d.label;
-			d.class = +d.class;
-			d.percentage = +d.percentage;
-          	d.name = d.name;
-          	d.probabilities = d.probabilities;
-          	d.confirmed = +d.confirmed;
-          	var probs = JSON.parse(d.probabilities);
-          	for (var i = 0; i < paths.length; i++) {
-          		if(paths[i] == d.name) {
-          			d.label = new_label;
-          			d.percentage = probs[new_label];
-          			d.confirmed = 1;
-          		}
-          	}
-          	images.push(d);
-		});
-
-		var json = JSON.stringify(images);
-		var xhttp = new XMLHttpRequest();
-  		xhttp.open("POST", "api/modify_csv/" + dataloc + '/' + lbl + '/' + cls + '/' + participant_id);
-  		xhttp.setRequestHeader("Content-Type", "application/json");
-  		xhttp.onreadystatechange = function() {//Call a function when the state changes.
-    		if(xhttp.readyState == 4 && xhttp.status == 204) {
-				location.reload(); 
-    		}
+	$.ajax({
+		method: 'POST',
+		url: '/api/relabel_images/' + dataloc + '/' + participant_id + '/' + lbl + '/' + cls,
+		data: {
+			arr: paths
+		},
+		success: function(data){
+			location.reload();
 		}
-  		xhttp.send(json);
+	});
+};
+
+function confirm_images(paths) {
+	var loader = document.getElementById('loader');
+	loader.style.display = "flex";
+	$.ajax({
+		method: 'POST',
+		url: '/api/confirm_images/' + dataloc + '/' + participant_id + '/' + lbl + '/' + cls,
+		data: {
+			arr: paths
+		},
+		success: function(data){
+			location.reload();
+		}
 	});
 };
 
