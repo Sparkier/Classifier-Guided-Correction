@@ -30,7 +30,8 @@ $(() => {
     const storeBrowserInfo = (id) => {
         const browserInfo = client.getBrowserData();
         const fingerprint = client.getFingerprint();
-    
+        console.log(browserInfo);
+        console.log(fingerprint);
         $.ajax({
             method: 'PUT',
             url: '/api/client_information/' + dataset + '/' + id,
@@ -46,6 +47,10 @@ $(() => {
     };    
     
     function dispatch() {
+        console.log(client.isMobile());
+        if (client.isMobile()) {
+            window.location.href = "mobile.html";
+        } 
         if (location == '/demographics.html') {
             demographics(dataset);
         } else if (location == '/confusion.html') {
@@ -65,6 +70,8 @@ $(() => {
             });
             survey_final(dataset);
         } else if (location == '/video.html'){
+
+        } else if (location == '/mobile.html'){
 
         } else if (location == '/images_explanation.html'){
             images_explanation(dataset);
