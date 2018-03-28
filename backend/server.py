@@ -160,6 +160,40 @@ def client_survey(dataset, participant_id):
     result = jsonify({'success': True})
     return result, ok_status, json_type
 
+
+# Save the endtime of deconfusion.
+@app.route('/ssim_start/<dataset>/<participant_id>', methods=['GET'])
+def ssim_start(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    if not (os.path.exists(os.path.join(new_loc, 'ssim_starttime.txt'))):
+        file = open(os.path.join(new_loc, 'ssim_starttime.txt'),'w') 
+        file.write(str(datetime.datetime.now()))
+        file.close()
+    return ('', 204)
+
+
+# Save the endtime of deconfusion.
+@app.route('/ssim_end/<dataset>/<participant_id>', methods=['GET'])
+def ssim_end(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    if not (os.path.exists(os.path.join(new_loc, 'ssim_endtime.txt'))):
+        file = open(os.path.join(new_loc, 'ssim_endtime.txt'),'w') 
+        file.write(str(datetime.datetime.now()))
+        file.close()
+    return ('', 204)
+
+
+# Save the endtime of deconfusion.
+@app.route('/deconfusion_start/<dataset>/<participant_id>', methods=['GET'])
+def deconfusion_start(dataset, participant_id):
+    new_loc = os.path.join(data_location, dataset, participant_id)
+    if not (os.path.exists(os.path.join(new_loc, 'starttime.txt'))):
+        file = open(os.path.join(new_loc, 'starttime.txt'),'w') 
+        file.write(str(datetime.datetime.now())) 
+        file.close()
+    return ('', 204)
+
+
 # Save the endtime of deconfusion.
 @app.route('/deconfusion_end/<dataset>/<participant_id>', methods=['GET'])
 def deconfusion_end(dataset, participant_id):
@@ -176,18 +210,15 @@ def deconfusion_end(dataset, participant_id):
 def time_exceeded(dataset, participant_id):
     new_loc = os.path.join(data_location, dataset, participant_id)
     result = jsonify({'exceeded': False})
-    if not (os.path.exists(os.path.join(new_loc, 'starttime.txt'))):
-        file = open(os.path.join(new_loc, 'starttime.txt'),'w') 
-        file.write(str(datetime.datetime.now())) 
-        file.close()
-    file = open(os.path.join(new_loc, 'starttime.txt'), 'r')
-    time_string = file.read()
-    file.close()    
-    datetime_old = datetime.datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S.%f")
-    datetime_new = datetime.datetime.now()
-    difference = datetime_new - datetime_old
-    if(datetime.timedelta(minutes=15) < difference):
-        result = jsonify({'exceeded': True})
+    if (os.path.exists(os.path.join(new_loc, 'starttime.txt'))):
+        file = open(os.path.join(new_loc, 'starttime.txt'), 'r')
+        time_string = file.read()
+        file.close()    
+        datetime_old = datetime.datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S.%f")
+        datetime_new = datetime.datetime.now()
+        difference = datetime_new - datetime_old
+        if(datetime.timedelta(minutes=15) < difference):
+            result = jsonify({'exceeded': True})
     return result, ok_status, json_type
 
 

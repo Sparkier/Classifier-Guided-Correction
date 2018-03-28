@@ -102,6 +102,14 @@ export function update_data(probabilities, paths) {
 		document.getElementById('detailImage').src = 'api/icon/placeholder.jpg';
 	}
 
+	detail_main.selectAll('.buttonrect').remove();
+	detail_main.selectAll('.buttontext').remove();
+	detail_main.selectAll('.desctext').remove();
+	detail_main.selectAll('.text').remove();
+	detail_main.selectAll('.buttoninvis').remove();
+	detail_main.selectAll(".axis").remove();
+	detail_main.selectAll(".rectdiag").remove();
+
 	// Add the four Buttons
 	var texts = [];
 	var desc = [];
@@ -206,60 +214,49 @@ export function update_data(probabilities, paths) {
 			.attr('height', button_size.height)
 			.attr('width', button_size.width)
 			.attr('fill', 'transparent');
-	} else {
-		detail_main.selectAll('.buttonrect').remove();
-		detail_main.selectAll('.buttontext').remove();
-		detail_main.selectAll('.desctext').remove();
-		detail_main.selectAll('.text').remove();
-		detail_main.selectAll('.buttoninvis').remove();
-		detail_main.selectAll(".axis").remove();
-	}
 
-    // Fill the probability array
-	for (var i = 0; i < probs.length; i++) {
-		probs[i] = 0.0;
-	}
-	for (var i = 0; i < probabilities.length; i++) {
-		for (var j = 0; j <  probs.length; j++) {
-			probs[j] = probs[j] + probabilities[i][j];
+		// Fill the probability array
+		for (var i = 0; i < probs.length; i++) {
+			probs[i] = 0.0;
 		}
-	}
-	for (var j = 0; j <  probs.length; j++) {
-		probs[j] = probs[j] / probabilities.length;	
-	}
-	
-	// Add bars to diagram
-	x_scale_trainclass = d3.scaleLinear().domain([0.0, 1.0]).range([0.0, class_size.width - 40]);
-	var y_tick_strings = [];
-	for (var i = 0; i < labels.length; i++) {
-		y_tick_strings.push(labels[i]);
-	}
-	var y_scale_trainclass = d3.scaleBand().domain(y_tick_strings).range([total_chart_height, 0]);
-	var y_shift = (3 * (button_size.height + bar_padding)) + 40;
-	var axis = d3.axisLeft(y_scale_trainclass)
+		for (var i = 0; i < probabilities.length; i++) {
+			for (var j = 0; j <  probs.length; j++) {
+				probs[j] = probs[j] + probabilities[i][j];
+			}
+		}
+		for (var j = 0; j <  probs.length; j++) {
+			probs[j] = probs[j] / probabilities.length;	
+		}
+		
+		// Add bars to diagram
+		x_scale_trainclass = d3.scaleLinear().domain([0.0, 1.0]).range([0.0, class_size.width - 40]);
+		var y_tick_strings = [];
+		for (var i = 0; i < labels.length; i++) {
+			y_tick_strings.push(labels[i]);
+		}
+		var y_scale_trainclass = d3.scaleBand().domain(y_tick_strings).range([total_chart_height, 0]);
+		var y_shift = (3 * (button_size.height + bar_padding)) + 40;
+		var axis = d3.axisLeft(y_scale_trainclass)
 
-	// Visible bars indicating class probabilities
-	detail_main.selectAll('.rectdiag')
-		.data(probs)
-		.attr('width', function(d) {
-			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
-		}) 
-		.enter()
-		.append('rect')
-		.attr('x', 30)
-		.attr('y', function(d, i) {
-			return y_scale_trainclass(i) + y_shift;
-		})
-		.attr('width', function(d) {
-			return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
-		}) 
-		.attr('height', class_size.height)
-		.attr('fill', '#A32638')
-		.attr('class', 'rectdiag')
-		.exit()
-		.remove();
+		// Visible bars indicating class probabilities
+		detail_main.selectAll('.rectdiag')
+			.data(probs)
+			.attr('width', function(d) {
+				return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
+			}) 
+			.enter()
+			.append('rect')
+			.attr('x', 30)
+			.attr('y', function(d, i) {
+				return y_scale_trainclass(i) + y_shift;
+			})
+			.attr('width', function(d) {
+				return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);
+			}) 
+			.attr('height', class_size.height)
+			.attr('fill', '#A32638')
+			.attr('class', 'rectdiag')
 
-	if(paths.length > 0) {
 		// Text for the Diagram
 		detail_main.append('text')
 			.text('Score Distribution')
@@ -274,7 +271,7 @@ export function update_data(probabilities, paths) {
 			.attr('transform', 'translate(' + 30 + ',' + y_shift + ')')
 			.attr('class', 'axis')
 			.call(d3.axisLeft(y_scale_trainclass));
-	
+		
 		detail_main.append('g')
 			.attr('transform', 'translate(' + 30 + ',' + (y_shift + total_chart_height) + ')')
 			.attr('class', 'axis')

@@ -1,7 +1,6 @@
 import {
 	load_images,
-	load_images_SSIM,
-	append
+	load_images_SSIM
 } from './images'
 import $ from 'jquery';
 const d3 = require('d3');
@@ -85,16 +84,18 @@ export default function trainclass(dataset, label, classification) {
 					ssim.push([d.label, d.class, d.image1, d.image2, d.ssim])
 				});
 				// Load Images for SSIM View
-				load_images_SSIM(dataset, ssim, all_images);
+				load_images_SSIM(dataset, ssim, all_images, (label == classification));
 			});
 
-			// Check images once at beginning
-			check_images(all_images, allImgs, correct, min, max);
-
-			var comboBox = document.getElementById("comboBox")
-			comboBox.onchange = function(){
+			if(label != classification) {
+				// Check images once at beginning
 				check_images(all_images, allImgs, correct, min, max);
-			};
+
+				var comboBox = document.getElementById("comboBox")
+				comboBox.onchange = function(){
+					check_images(all_images, allImgs, correct, min, max);
+				};
+			}
 
 			// Init the Range Slider
 			$("#range").ionRangeSlider({
@@ -107,7 +108,9 @@ export default function trainclass(dataset, label, classification) {
 				onFinish: function (data) {
 					min = data.from;
 					max = data.to;
-					check_images(all_images, allImgs, correct, min, max);
+					if(label != classification){
+						check_images(all_images, allImgs, correct, min, max);
+					}
 				}
 			});
 		});

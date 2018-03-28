@@ -477,6 +477,14 @@ export default function confusionmatrix(dataset) {
 						.attr('opacity', '0.0');
 				}
 
+				if(!ssimAdded) {
+					$.ajax({
+						method: 'GET',
+						url: '/api/ssim_end/' + dataset + '/' + participant_id
+					}).done(() => {
+						window.location.href = "video2.html";
+					});
+				}
 				if(!ssimAdded && !buckAdded) {
 					window.location.href = "survey.html";
 				}

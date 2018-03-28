@@ -3,6 +3,7 @@ import confusionmatrix from './confusionmatrix';
 import detailview from './detailview';
 import demographics from './demographics';
 import survey_final from './survey';
+import video from './video'
 import images_explanation from './images_explanation';
 import $ from 'jquery';
 import * as browserStore from 'storejs';
@@ -30,8 +31,6 @@ $(() => {
     const storeBrowserInfo = (id) => {
         const browserInfo = client.getBrowserData();
         const fingerprint = client.getFingerprint();
-        console.log(browserInfo);
-        console.log(fingerprint);
         $.ajax({
             method: 'PUT',
             url: '/api/client_information/' + dataset + '/' + id,
@@ -47,12 +46,15 @@ $(() => {
     };    
     
     function dispatch() {
-        console.log(client.isMobile());
         if (client.isMobile()) {
             window.location.href = "mobile.html";
         } 
         if (location == '/demographics.html') {
             demographics(dataset);
+        } else if (location == '/images_explanation.html'){
+            images_explanation(dataset);
+        } else if (location == '/video1.html'){
+            video(dataset, 0);
         } else if (location == '/confusion.html') {
             $.ajax({
                 method: 'GET',
@@ -63,18 +65,15 @@ $(() => {
                 }
             });
             confusionmatrix(dataset);
+        } else if (location == '/video2.html'){
+            video(dataset, 1);
         } else if (location == '/survey.html') {
             $.ajax({
                 method: 'GET',
                 url: '/api/deconfusion_end/' + dataset + '/' + participant_id
             });
             survey_final(dataset);
-        } else if (location == '/video.html'){
-
         } else if (location == '/mobile.html'){
-
-        } else if (location == '/images_explanation.html'){
-            images_explanation(dataset);
         } else {
             var label = findGetParameter('label');
             var classification = findGetParameter('class');

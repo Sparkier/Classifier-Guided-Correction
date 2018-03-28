@@ -94,7 +94,7 @@ export function load_images(dataset, images, num_images, correct) {
   update_data(selected_probs, selected_paths);
 }
 
-export function load_images_SSIM(dataset, ssim, all_images) {
+export function load_images_SSIM(dataset, ssim, all_images, same) {
   // Create the Canvas Element
   var newCanvas = document.createElement("canvas");
   var myNode = document.getElementById('ssimContainer');
@@ -126,6 +126,7 @@ export function load_images_SSIM(dataset, ssim, all_images) {
 
   // Once a pair has been skipped, this offset comes into play.
   var i_offset = 0;
+  var appended = false;
   // Add as many pairs as fitting into view.
   for (var i = 0; i < num_pairs; i++) {
     var found_images = [];
@@ -142,6 +143,7 @@ export function load_images_SSIM(dataset, ssim, all_images) {
     if(found_images.length == 2) {
       // Add them to the view.
       for (var j = 0; j < found_images.length; j++) {
+        appended = true;
         appendSSIM(dataset, found_images[j], i - i_offset, j);
       }
     } else {
@@ -154,6 +156,9 @@ export function load_images_SSIM(dataset, ssim, all_images) {
         i_offset = i_offset + 1;
       }
     }
+  }
+  if(!appended && same) {
+    window.history.back();
   }
 }
 

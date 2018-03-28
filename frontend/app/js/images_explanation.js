@@ -49,6 +49,6 @@ export default function images_explanation(dataset) {
     }
 
     function complete() {
-        window.location.href = "video.html";
+        window.location.href = "video1.html";
     }
 }

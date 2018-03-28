@@ -2,7 +2,7 @@ import $ from 'jquery';
 import * as browserStore from 'storejs';
 import * as survey from 'survey-jquery';
 
-export default function demographics(dataset) {   
+export default function demographics(dataset) {
     survey.defaultBootstrapCss.navigationButton = "btn btn-primary";
     survey.Survey.cssType = "bootstrap";
     const participant_id = browserStore.get('participant_id');
@@ -43,7 +43,7 @@ export default function demographics(dataset) {
         }).done(() => {
             setTimeout(function () {
                 window.location.href = "images_explanation.html";
-            }, 10000);
+            }, 1000);
         });
     }
 }
