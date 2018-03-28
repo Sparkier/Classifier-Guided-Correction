@@ -236,6 +236,7 @@ export function update_data(probabilities, paths) {
 			y_tick_strings.push(labels[i]);
 		}
 		var y_scale_trainclass = d3.scaleBand().domain(y_tick_strings).range([total_chart_height, 0]);
+		var y_scale_trainclass2 = d3.scaleLinear().domain([0, labels.length]).range([0, total_chart_height]);
 		var y_shift = (3 * (button_size.height + bar_padding)) + 40;
 		var axis = d3.axisLeft(y_scale_trainclass)
 
@@ -249,7 +250,7 @@ export function update_data(probabilities, paths) {
 			.append('rect')
 			.attr('x', 30)
 			.attr('y', function(d, i) {
-				return y_scale_trainclass(i) + y_shift;
+				return (total_chart_height - y_scale_trainclass2(i)) + y_shift - class_size.height;
 			})
 			.attr('width', function(d) {
 				return isNaN(x_scale_trainclass(d)) ? 0 : x_scale_trainclass(d);

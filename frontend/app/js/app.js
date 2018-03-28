@@ -11,7 +11,7 @@ import 'clientjs';
 
 $(() => {
     const client = new ClientJS();
-    var dataset = 'mnist_mod';
+    var dataset = 'cifar10_test';
     var location = window.location.href.toString().split(window.location.host)[1];
     var participant_id = browserStore.get('participant_id');
 
