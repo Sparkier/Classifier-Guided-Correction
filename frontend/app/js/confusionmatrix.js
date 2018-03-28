@@ -2,7 +2,7 @@ import $ from 'jquery';
 const d3 = require('d3');
 import * as browserStore from 'storejs';
 
-export default function confusionmatrix(dataset) {
+export default function confusionmatrix(dataset, mode) {
 	window.addEventListener( "pageshow", function ( event ) {
 		var historyTraversal = event.persisted || ( typeof window.performance != "undefined" && window.performance.navigation.type === 2 );
 		if ( historyTraversal ) {
@@ -477,7 +477,7 @@ export default function confusionmatrix(dataset) {
 						.attr('opacity', '0.0');
 				}
 
-				if(!ssimAdded) {
+				if(!ssimAdded && mode == 0) {
 					$.ajax({
 						method: 'GET',
 						url: '/api/ssim_end/' + dataset + '/' + participant_id

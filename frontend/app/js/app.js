@@ -14,6 +14,7 @@ $(() => {
     var dataset = 'mnist_mod';
     var location = window.location.href.toString().split(window.location.host)[1];
     var participant_id = browserStore.get('participant_id');
+    var mode = 0;
 
     if(participant_id === undefined) {
         $.ajax({
@@ -64,8 +65,9 @@ $(() => {
                     window.location.href = "survey.html";
                 }
             });
-            confusionmatrix(dataset);
+            confusionmatrix(dataset, mode);
         } else if (location == '/video2.html'){
+            mode = 1;
             video(dataset, 1);
         } else if (location == '/survey.html') {
             $.ajax({
