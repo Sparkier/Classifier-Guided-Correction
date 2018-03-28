@@ -27,7 +27,7 @@ export default function video(dataset, mode) {
             id = 'TX3XNsG5eO4';
             call = '/api/ssim_start/' + dataset + '/' + participant_id;
         } else {
-            id = 'lFA2yoFkGK0';
+            id = '-9ivaZwFj0U';
             call = '/api/deconfusion_start/' + dataset + '/' + participant_id;
         }
         player1 = YouTubePlayer('youtubevideo', {

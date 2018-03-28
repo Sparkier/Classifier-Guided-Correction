@@ -137,7 +137,7 @@ export function update_data(probabilities, paths) {
 			.attr('height', button_size.height)
 			.attr('width', button_size.width)
 			.attr('fill', function(d, i) {
-				return 'white'
+				return 'grey'
 			})
 			.attr('stroke-width', '1')
 			.attr('stroke', 'black')
@@ -148,6 +148,7 @@ export function update_data(probabilities, paths) {
 			.data(texts)
 			.enter()
 			.append('text')
+			.style('fill', 'white')
 			.text(function(d, i) {
 				return texts[i];
 			})
