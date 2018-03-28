@@ -24,10 +24,10 @@ export default function video(dataset, mode) {
         var id = '';
         var call = '';
         if(mode == 0) {
-            id = 'J_MQDjoqsaU';
+            id = 'TX3XNsG5eO4';
             call = '/api/ssim_start/' + dataset + '/' + participant_id;
         } else {
-            id = 'rC1t9lHBSM0';
+            id = 'lFA2yoFkGK0';
             call = '/api/deconfusion_start/' + dataset + '/' + participant_id;
         }
         player1 = YouTubePlayer('youtubevideo', {

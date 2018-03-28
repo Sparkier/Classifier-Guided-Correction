@@ -2,7 +2,7 @@ import $ from 'jquery';
 const d3 = require('d3');
 import * as browserStore from 'storejs';
 
-export default function confusionmatrix(dataset, mode) {
+export default function confusionmatrix(dataset) {
 	window.addEventListener( "pageshow", function ( event ) {
 		var historyTraversal = event.persisted || ( typeof window.performance != "undefined" && window.performance.navigation.type === 2 );
 		if ( historyTraversal ) {
@@ -327,23 +327,23 @@ export default function confusionmatrix(dataset, mode) {
 							(chart_padding.vertical / 2) + margin.top))
 							.attr('width', dim)
 							.attr('height', dim);
+							
+						// Add Hyperrefs linking to the Detail View
+						svg_confusion.append('a')
+							.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
+								label_number)
+							.append('rect')
+							.attr('x', 0)
+							.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
+							(chart_padding.vertical / 2) + margin.top))
+							.attr('width', total_chart_width)
+							.attr('height', total_chart_height)
+							.attr('class', label_number)
+							.attr('label', label_number)
+							.attr('opacity', '0.0')
+							.on('mouseover', handleMouseOver)
+							.on('mouseout', handleMouseOut);
 					}
-
-					// Add Hyperrefs linking to the Detail View
-					svg_confusion.append('a')
-						.attr("xlink:href", 'trainclass.html?label=' + label_number + '&class=' + 
-							label_number)
-						.append('rect')
-						.attr('x', 0)
-						.attr('y', (i * (total_chart_height + chart_padding.vertical) + 
-						(chart_padding.vertical / 2) + margin.top))
-						.attr('width', total_chart_width)
-						.attr('height', total_chart_height)
-						.attr('class', label_number)
-						.attr('label', label_number)
-						.attr('opacity', '0.0')
-						.on('mouseover', handleMouseOver)
-						.on('mouseout', handleMouseOut);
 
 					// Add the Label Name
 					svg_confusion.append('text')
@@ -477,12 +477,14 @@ export default function confusionmatrix(dataset, mode) {
 						.attr('opacity', '0.0');
 				}
 
-				if(!ssimAdded && mode == 0) {
+				if(!ssimAdded) {
 					$.ajax({
 						method: 'GET',
 						url: '/api/ssim_end/' + dataset + '/' + participant_id
-					}).done(() => {
-						window.location.href = "video2.html";
+					}).done((data) => {
+						if(data.ended == false) {
+							window.location.href = "video2.html";
+						}
 					});
 				}
 				if(!ssimAdded && !buckAdded) {

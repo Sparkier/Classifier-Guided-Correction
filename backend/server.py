@@ -176,11 +176,14 @@ def ssim_start(dataset, participant_id):
 @app.route('/ssim_end/<dataset>/<participant_id>', methods=['GET'])
 def ssim_end(dataset, participant_id):
     new_loc = os.path.join(data_location, dataset, participant_id)
+    result = jsonify({'ended': True})
     if not (os.path.exists(os.path.join(new_loc, 'ssim_endtime.txt'))):
         file = open(os.path.join(new_loc, 'ssim_endtime.txt'),'w') 
         file.write(str(datetime.datetime.now()))
         file.close()
-    return ('', 204)
+        result = jsonify({'ended': False})
+    return result, ok_status, json_type
+
 
 
 # Save the endtime of deconfusion.
