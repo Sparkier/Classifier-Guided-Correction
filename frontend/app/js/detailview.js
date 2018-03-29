@@ -117,7 +117,7 @@ export function update_data(probabilities, paths) {
 		texts = [
 			'Label ' + lbl + ' Correct',
 			'Label ' + cls + ' Correct',
-			'None',
+			'Other Label Correct',
 			'Delete Items'
 		];
 
@@ -137,10 +137,8 @@ export function update_data(probabilities, paths) {
 			.attr('height', button_size.height)
 			.attr('width', button_size.width)
 			.attr('fill', function(d, i) {
-				return 'grey'
+				return 'darkgrey'
 			})
-			.attr('stroke-width', '1')
-			.attr('stroke', 'black')
 			.attr('class', 'buttonrect');
 
 		// Text for Class Label and Probability Value
@@ -148,15 +146,16 @@ export function update_data(probabilities, paths) {
 			.data(texts)
 			.enter()
 			.append('text')
+			.style('text-anchor', 'middle')
 			.style('fill', 'white')
 			.text(function(d, i) {
 				return texts[i];
 			})
 			.attr('transform', function(d, i) {
 				if(i == 3) {
-					return 'translate('+ 5 +','+ (total_height - margin.bottom - 18) +')';
+					return 'translate('+ (button_size.width/2) +','+ (total_height - margin.bottom - 18) +')';
 				} else {
-					return 'translate('+ 5 +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
+					return 'translate('+ (button_size.width/2) +','+ ((button_size.height * (i+1)) + (bar_padding * i) - 8) +')';
 				}
 			})
 			.attr('class', 'buttontext');
