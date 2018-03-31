@@ -115,8 +115,8 @@ export function update_data(probabilities, paths) {
 	var desc = [];
 	if(paths.length > 0 ) {
 		texts = [
-			'Label ' + lbl + ' Correct',
-			'Label ' + cls + ' Correct',
+			'Label ' + labels[lbl] + ' Correct',
+			'Label ' + labels[cls] + ' Correct',
 			'Other Label Correct',
 			'Delete Items'
 		];
@@ -171,7 +171,7 @@ export function update_data(probabilities, paths) {
 						confirm_images(paths);
 					}
 				} else if (i == 1) {
-					if (confirm("Label these images as "+cls+"?") == true) {
+					if (confirm("Label these images as "+labels[cls]+"?") == true) {
 						relabel_images(paths);
 					}
 				} else if (i == 2) {
