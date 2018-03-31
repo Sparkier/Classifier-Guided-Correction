@@ -165,7 +165,7 @@ def to_hue(arr):
 def re_tsne(items, location):
     imgs = []
     for i in items:
-        image_data = imresize(imread(os.path.join(location, 'saliency', i['name'])), (28, 28)).astype(Math.float)
+        image_data = imresize(imread(os.path.join(location, 'saliency', i[4])), (28, 28)).astype(Math.float)
         image_data = to_hue(image_data)
         image_data = image_data / 255.0
         imgs.append(image_data.flatten())
@@ -173,8 +173,7 @@ def re_tsne(items, location):
     Y = tsne(array(imgs), 2, perplexity=2)
     Y_normed = Y / Math.absolute(Y).max(axis=0)
 
-    combined = []
     for i in range(len(items)):
-        combined.append([items[i], list(Y_normed[i])])
+        items[i][7] = list(Y_normed[i])
 
-    return combined
+    return items

@@ -4,9 +4,11 @@
 	<title>Training De-Confusion</title>
 	<meta charset="utf-8">
     <script src="js/bundle.js"></script>
-    <link rel="icon" href="res/viscom-logo_red.png">
-    <link rel="stylesheet" type="text/css" href="css/vis.css">
-    <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet"> 
+    <link rel="stylesheet" type="text/css" href="css/trainclass.css">
+	<link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="css/ion.rangeSlider.css">
+	<link rel="stylesheet" type="text/css" href="css/ion.rangeSlider.skinFlat.css">
 </head>
 <body>
 
@@ -16,33 +18,40 @@
 		</div>		
 	</header>
 	<main>
-		<section class="leftSection">
-			<div id="trainclass">
-				<div class="classificationContainer" id="classContainer">
-					<div class="test">
-						<h2 id="detailHeading">Change or Confirm Labels</h2>						
-						<div class="detailContainer" id="detailContainer">
-							<img id="detailImage" src="api/image/other/all/placeholder/placeholder.jpg" width="510" height="510">
-						</div>
-					</div>
+		<h2 id="classHeading">Classification of Training Images</h2>
+		<section class="leftSection" id="rightSection">
+			<div class="imagesContainer" id="imContainer">
+				<p>Labeled Images</p>
+			</div>
+			<div class="controlsContainer" id="constrolsContainer">
+				<div id="element1">
+					<input type="text" id="range" value="" name="range" />
 				</div>
+				<div id="element2">
+					<span id="span" class="absoluteCenter">0 Selected</span>
+				</div> 
+				<div id="element3">
+					<form class="comboBox" id="comboContainer">
+						<label>
+							<select id="comboBox">
+								<option>Cluster View</option>
+								<option>List View</option>
+							</select>
+						</label>
+					</form>
+				</div> 
+			</div>
+			<div class="ssimContainer" id="ssimContainer">
+				<p>Most Similar Images</p>
 			</div>
 		</section>
-		<section class="rightSection" id="rightSection">
-			<h2 class="classificationHeading" id="classHeading">Classification of Training Images</h2>
-			<div class="trainclassContainer" id="trainclassContainer"></div>
-			<div id="images">
-				<form onchange="location.reload()" class="comboBox" id="comboContainer">
-					<label>
-						<select name="top5" id="comboBox">
-							<option>Embedding</option>
-							<option>List</option>
-						</select>
-					</label>
-				</form>
-				<div class="imagesContainer" id="imContainer"></div>
-				<div class="ssimContainer" id="ssimContainer">
-				Most Similar Images
+		<section class="rightSection">
+			<div id="trainclass">
+				<div class="classificationContainer" id="classContainer">
+					<p>Detail View</p>
+					<img id="detailImage" src="api/icon/placeholder.jpg" width="500" height="500">
+					<div class="detailContainer" id="detailContainer">
+					</div>
 				</div>
 			</div>
 		</section>
@@ -52,5 +61,28 @@
 			Image Classification Data Improvement
 		</p>
 	</footer>
+
+	<div id="popup">
+		<div id="popupNone">
+			<form action="#" id="formNone" method="post" name="form">
+				<h2>Correct Label</h2>
+				<hr>
+				<form class="comboBox" id="comboContainer">
+					<label>
+						<select id="labelBox">
+						</select>
+					</label>
+				</form>
+				<div id=buttons>
+					<a id="cancel">Cancel</a>
+					<a id="submit">Confirm</a>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	<div id="loader">
+		<div class="spinner"></div>
+	</div>
 </body>
 </html>
