@@ -1,5 +1,6 @@
-# Interactive Visualization for Correcting CNN-Image Classification Training Data Errors
+# Classifier-Guided Visual Correction of Noisy Labels for Image Classification Tasks
 
+This [paper](https://diglib.eg.org/bitstream/handle/10.1111/cgf13973/v39i3pp195-205.pdf) was published at EuroVIS 2020.
 The Techniques implemented within this context enable fast identification and correction of errors in training data for CNN image classifiers.
 
 ## Usage
