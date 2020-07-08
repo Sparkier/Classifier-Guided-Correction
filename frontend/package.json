@@ -24,7 +24,7 @@
     "babelify": "^7.3.0",
     "browser-sync": "^2.18.12",
     "browserify": "^14.4.0",
-    "eslint": "^4.18.1",
+    "eslint": "^4.18.2",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-google": "^0.9.1",
