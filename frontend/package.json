@@ -6,7 +6,7 @@
   "dependencies": {
     "clientjs": "^0.1.11",
     "d3": "^4.9.1",
-    "fabric": "^2.0.3",
+    "fabric": "^5.2.4",
     "gulp-sourcemaps": "^2.6.1",
     "install": "^0.10.4",
     "ion-rangeslider": "^2.2.0",
